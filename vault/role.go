@@ -18,12 +18,13 @@ type roleResource struct {
 type Role struct {
 	resourceMetadata
 	roleResource
+	vault Vault
 }
 
 // Role gets the role named name from the DSV of the given tenant
 func (v Vault) Role(name string) (*Role, error) {
-	role := new(Role)
-	data, err := accessResource("GET", rolesResource, name, nil, v.config)
+	role := &Role{vault: v}
+	data, err := v.accessResource("GET", rolesResource, name, nil)
 
 	if err != nil {
 		return nil, err

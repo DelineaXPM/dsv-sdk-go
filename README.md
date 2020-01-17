@@ -6,9 +6,20 @@ A Golang API and examples for [Thycotic](https://thycotic.com/)
 ## Configure
 
 The API requires a `Configuration` object containing a `ClientID`, `ClientSecret`
-and `Tenant`.
+and `Tenant`:
 
-For example, the tests populates `Configuration` from JSON:
+```golang
+type ClientCredential struct {
+    ClientID, ClientSecret string
+}
+
+type Configuration struct {
+    Credentials              ClientCredential
+    Tenant, TLD, URLTemplate string
+}
+```
+
+The unit tests populate `Configuration` from `test_config.json`:
 
 ```golang
 config := new(Configuration)
@@ -20,26 +31,30 @@ if cj, err := ioutil.ReadFile("../test_config.json"); err == nil {
 tss := New(*config)
 ```
 
-Example JSON configuration:
+Create `test_config.json`:
 
 ```json
 {
-    "client_id": "93d866d4-635f-4d4e-9ce3-0ef7f879f319",
-    "client_secret": "xxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxx-xxxxx",
+    "credentials": {
+        "client_id": "93d866d4-635f-4d4e-9ce3-0ef7f879f319",
+        "client_secret": "xxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxx-xxxxx"
+    },
     "tenant": "mytenant"
 }
 ```
 
 ## Test
 
-`vault/vault_test.go` declares:
+`vault/role_test.go` declares:
 
 ```golang
-const (
-	ConfigFile = "../test_config.json"
-	roleName   = "test-role"
-	secretName = "/test/secret"
-)
+const roleName = "test-role"
+```
+
+`vault/secret_test.go` declares:
+
+```golang
+const secretName = "/test/secret"
 ```
 
 The tests assume that `roleName` can exists and has privilege to create, read,

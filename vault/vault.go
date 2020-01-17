@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -12,27 +11,11 @@ import (
 )
 
 const (
-	urlTemplate string = "https://%s.secretsvaultcloud.com/v1/%s%s"
+	defaultTLD         string = "com"
+	defaultURLTemplate string = "https://%s.secretsvaultcloud.%s/v1/%s%s"
 )
 
-// Configuration used to request an accessToken for the API
-type Configuration struct {
-	ClientID     string `json:"client_id"`
-	ClientSecret string `json:"client_secret"`
-	Tenant       string
-}
-
-// Vault provides access to secrets stored in Thycotic DSV
-type Vault struct {
-	config Configuration
-}
-
-// New returns an initialized Secrets object
-func New(config Configuration) *Vault {
-	return &Vault{config: config}
-}
-
-// Each resource (Secret, Role, ...) embeds this in it's struct
+// resourceMetadata are fields common to all complex resources
 type resourceMetadata struct {
 	ID, Description           string
 	Created, LastModified     time.Time
@@ -40,16 +23,50 @@ type resourceMetadata struct {
 	Version                   string
 }
 
-// Each simple resource (Client, ...) embeds this in it's struct instead
+// simpleResourceMetadata are fields common to all simple resources
 type simpleResourceMetadata struct {
 	ID        string `json:"id"`
 	Created   time.Time
 	CreatedBy string
 }
 
+// ClientCredential contains the client_id and client_secret that the API will
+// use to make requests
+type ClientCredential struct {
+	ClientID, ClientSecret string
+}
+
+// Configuration used to request an accessToken for the API
+type Configuration struct {
+	Credentials              ClientCredential
+	Tenant, TLD, URLTemplate string
+}
+
+// Vault provides access to secrets stored in Thycotic DSV
+type Vault struct {
+	Configuration
+}
+
+// New returns a Vault or an error if the Configuration is invalid
+func New(config Configuration) (*Vault, error) {
+	if config.Credentials.ClientID == "" {
+		return nil, fmt.Errorf("Credentials.ClientID must be set")
+	}
+	if config.Tenant == "" {
+		return nil, fmt.Errorf("Tenant must be set")
+	}
+	if config.TLD == "" {
+		config.TLD = defaultTLD
+	}
+	if config.URLTemplate == "" {
+		config.URLTemplate = defaultURLTemplate
+	}
+	return &Vault{config}, nil
+}
+
 // accessResource uses the accessToken to access the API resource.
 // It assumes an appropriate combination of method, resource, path and input.
-func accessResource(method, resource, path string, input interface{}, config Configuration) ([]byte, error) {
+func (v Vault) accessResource(method, resource, path string, input interface{}) ([]byte, error) {
 	switch resource {
 	case "clients", "roles", "secrets":
 	default:
@@ -59,11 +76,6 @@ func accessResource(method, resource, path string, input interface{}, config Con
 		return nil, fmt.Errorf(message)
 	}
 
-	if path != "" {
-		path = "/" + strings.TrimLeft(path, "/")
-	}
-
-	url := fmt.Sprintf(urlTemplate, config.Tenant, resource, path)
 	body := bytes.NewBuffer([]byte{})
 
 	if input != nil {
@@ -75,21 +87,12 @@ func accessResource(method, resource, path string, input interface{}, config Con
 		}
 	}
 
-	req, err := http.NewRequest(method, url, body)
+	req, err := http.NewRequest(method, v.urlFor(resource, path), body)
 
 	if err != nil {
 		log.Printf("[DEBUG] creating req: %s /%s/%s: %s", method, resource, path, err)
 		return nil, err
 	}
-
-	accessToken, err := getAccessToken(config)
-
-	if err != nil {
-		log.Print("[DEBUG] error getting accessToken:", err)
-		return nil, err
-	}
-
-	req.Header.Add("Authorization", "Bearer "+accessToken)
 
 	switch method {
 	case "POST", "PUT":
@@ -98,43 +101,41 @@ func accessResource(method, resource, path string, input interface{}, config Con
 
 	log.Printf("[DEBUG] calling %s", req.URL.String())
 
+	accessToken, err := v.getAccessToken()
+
+	if err != nil {
+		log.Print("[DEBUG] error getting accessToken:", err)
+		return nil, err
+	}
+
+	req.Header.Add("Authorization", "Bearer "+accessToken)
+
 	data, _, err := handleResponse((&http.Client{}).Do(req))
 
 	return data, err
 }
 
-type accessGrant struct {
-	AccessToken, TokenType string
-	ExpiresIn              int
-}
-
-var grant *accessGrant // TODO proper caching and expiration checking
-
 // getAccessToken uses the client_id and client_secret, to call the token
 // endpoint and get an accessGrant.
-func getAccessToken(config Configuration) (string, error) {
-	if grant != nil {
-		return grant.AccessToken, nil
-	}
-
+func (v Vault) getAccessToken() (string, error) {
 	grantRequest, err := json.Marshal(struct {
 		GrantType    string `json:"grant_type"`
 		ClientID     string `json:"client_id"`
 		ClientSecret string `json:"client_secret"`
 	}{
 		"client_credentials",
-		config.ClientID,
-		config.ClientSecret,
+		v.Credentials.ClientID,
+		v.Credentials.ClientSecret,
 	})
 
 	if err != nil {
-		log.Print("[INFO] marshaling grantRequest")
+		log.Print("[WARN] marshalling grantRequest")
 		return "", err
 	}
 
-	url := fmt.Sprintf(urlTemplate, config.Tenant, "token", "")
+	url := v.urlFor("token", "")
 
-	log.Printf("[DEBUG] calling %s with client_id %s", url, config.ClientID)
+	log.Printf("[DEBUG] calling %s with client_id %s", url, v.Credentials.ClientID)
 
 	data, _, err := handleResponse(http.Post(url, "application/json",
 		bytes.NewReader(grantRequest)))
@@ -144,39 +145,23 @@ func getAccessToken(config Configuration) (string, error) {
 		return "", err
 	}
 
-	newGrant := new(accessGrant)
+	grant := struct {
+		AccessToken, TokenType string
+		ExpiresIn              int
+		// TODO cache the grant until it expires
+	}{}
 
-	if err = json.Unmarshal(data, &newGrant); err != nil {
+	if err = json.Unmarshal(data, &grant); err != nil {
 		log.Print("[INFO] parsing grant response:", err)
 		return "", err
 	}
-
-	grant = newGrant
-
 	return grant.AccessToken, nil
 }
 
-// handleResponse processes the response according to the HTTP status
-func handleResponse(res *http.Response, err error) ([]byte, *http.Response, error) {
-	if err != nil { // fall-through if there was an underlying err
-		return nil, res, err
+// urlFor the URL of the given resource and path in the current Vault
+func (v Vault) urlFor(resource, path string) string {
+	if path != "" {
+		path = "/" + strings.TrimLeft(path, "/")
 	}
-
-	data, err := ioutil.ReadAll(res.Body)
-
-	if err != nil {
-		return nil, res, err
-	}
-
-	// if the response was 2xx then return it, otherwise, consider it an error
-	if res.StatusCode > 199 && res.StatusCode < 300 {
-		return data, res, nil
-	}
-
-	// truncate the data to 64 bytes before returning it as part of the error
-	if len(data) > 64 {
-		data = append(data[:64], []byte("...")...)
-	}
-
-	return nil, res, fmt.Errorf("%s: %s", res.Status, string(data))
+	return fmt.Sprintf(v.URLTemplate, v.Tenant, v.TLD, resource, path)
 }

@@ -19,12 +19,13 @@ type secretResource struct {
 type Secret struct {
 	resourceMetadata
 	secretResource
+	vault Vault
 }
 
 // Secret gets the secret at path from the DSV of the given tenant
 func (v Vault) Secret(path string) (*Secret, error) {
-	secret := new(Secret)
-	data, err := accessResource("GET", secretsResource, path, nil, v.config)
+	secret := &Secret{vault: v}
+	data, err := v.accessResource("GET", secretsResource, path, nil)
 
 	if err != nil {
 		return nil, err

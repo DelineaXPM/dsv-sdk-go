@@ -8,12 +8,6 @@ import (
 // clientsResource is the HTTP URL path component for the clients resource
 const clientsResource = "clients"
 
-// Clients provides access to clients configured in Thycotic DSV
-type Clients struct {
-	clientCredential Configuration
-	tenant           string
-}
-
 // clientResource is composed with resourceMetadata to for ClientContents
 type clientResource struct {
 	ClientID     string `json:"clientId"`
@@ -25,14 +19,13 @@ type clientResource struct {
 type Client struct {
 	simpleResourceMetadata
 	clientResource
-	config Configuration
+	vault Vault
 }
 
 // Client gets the client with id from the DSV of the given tenant
 func (v Vault) Client(id string) (*Client, error) {
-	client := new(Client)
-	client.config = v.config
-	data, err := accessResource("GET", clientsResource, id, nil, v.config)
+	client := &Client{vault: v}
+	data, err := v.accessResource("GET", clientsResource, id, nil)
 
 	if err != nil {
 		return nil, err
@@ -47,7 +40,7 @@ func (v Vault) Client(id string) (*Client, error) {
 
 // Delete deletes the client from the DSV of the given tenant
 func (c Client) Delete() error {
-	if _, err := accessResource("DELETE", clientsResource, c.ClientID, nil, c.config); err != nil {
+	if _, err := c.vault.accessResource("DELETE", clientsResource, c.ClientID, nil); err != nil {
 		return err
 	}
 
@@ -56,7 +49,7 @@ func (c Client) Delete() error {
 
 // New creates a new Client given a roleName
 func (v Vault) New(client *Client) error {
-	data, err := accessResource("POST", clientsResource, "/", client, v.config)
+	data, err := v.accessResource("POST", clientsResource, "/", client)
 
 	if err != nil {
 		return err

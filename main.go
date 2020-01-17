@@ -9,10 +9,12 @@ import (
 )
 
 func main() {
-	dsv := vault.New(vault.Configuration{
-		ClientID:     os.Getenv("DSV_CLIENT_ID"),
-		ClientSecret: os.Getenv("DSV_CLIENT_SECRET"),
-		Tenant:       os.Getenv("DSV_TENANT"),
+	dsv, err := vault.New(vault.Configuration{
+		Credentials: vault.ClientCredential{
+			ClientID:     os.Getenv("DSV_CLIENT_ID"),
+			ClientSecret: os.Getenv("DSV_CLIENT_SECRET"),
+		},
+		Tenant: os.Getenv("DSV_TENANT"),
 	})
 	secret, err := dsv.Secret("path:of:the:secret")
 
