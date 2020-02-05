@@ -36,8 +36,8 @@ Create `test_config.json`:
 ```json
 {
     "credentials": {
-        "client_id": "93d866d4-635f-4d4e-9ce3-0ef7f879f319",
-        "client_secret": "xxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxx-xxxxx"
+        "clientId": "93d866d4-635f-4d4e-9ce3-0ef7f879f319",
+        "clientSecret": "xxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxx-xxxxx"
     },
     "tenant": "mytenant"
 }
