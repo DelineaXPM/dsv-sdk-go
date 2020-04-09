@@ -3,22 +3,22 @@ package vault
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os"
 )
 
-const ConfigFile = "../test_config.json"
-
 var config = func() *Configuration {
-	cj, err := ioutil.ReadFile(ConfigFile)
+	if cj, err := ioutil.ReadFile("../test_config.json"); err == nil {
+		c := new(Configuration)
 
-	if err != nil {
-		return nil
+		json.Unmarshal(cj, &c)
+		return c
 	}
-
-	config := new(Configuration)
-
-	if err := json.Unmarshal(cj, config); err == nil {
-		return config
+	return &Configuration{
+		Tenant: os.Getenv("DSV_TENANT"),
+		Credentials: ClientCredential{
+			ClientID:     os.Getenv("DSV_CLIENT_ID"),
+			ClientSecret: os.Getenv("DSV_CLIENT_SECRET"),
+		},
 	}
-	return nil
 }()
 var dsv, _ = New(*config)
