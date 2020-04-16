@@ -1,5 +1,7 @@
 # The Thycotic DevOps Secrets Vault SDK for Go
 
+![Tests](https://github.com/thycotic/dsv-sdk-go/workflows/Tests/badge.svg)
+
 A Golang API and examples for [Thycotic](https://thycotic.com/)
 [DevOps Secrets Vault](https://thycotic.com/products/devops-secrets-vault-password-management/).
 
