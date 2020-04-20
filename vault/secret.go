@@ -11,7 +11,7 @@ const secretsResource = "secrets"
 // secretResource is composed with resourceMetadata to for SecretContents
 type secretResource struct {
 	Attributes []string
-	Data       map[string]string
+	Data       map[string]interface{}
 	Path       string
 }
 
