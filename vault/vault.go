@@ -110,7 +110,7 @@ func (v Vault) accessResource(method, resource, path string, input interface{}) 
 
 	req.Header.Add("Authorization", "Bearer "+accessToken)
 
-	data, _, err := handleResponse((&http.Client{}).Do(req))
+	data, err := handleResponse((&http.Client{}).Do(req))
 
 	return data, err
 }
@@ -137,7 +137,7 @@ func (v Vault) getAccessToken() (string, error) {
 
 	log.Printf("[DEBUG] calling %s with client_id %s", url, v.Credentials.ClientID)
 
-	data, _, err := handleResponse(http.Post(url, "application/json",
+	data, err := handleResponse(http.Post(url, "application/json",
 		bytes.NewReader(grantRequest)))
 
 	if err != nil {
