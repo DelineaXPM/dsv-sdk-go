@@ -52,6 +52,9 @@ func New(config Configuration) (*Vault, error) {
 	if config.Credentials.ClientID == "" {
 		return nil, fmt.Errorf("Credentials.ClientID must be set")
 	}
+	if config.Credentials.ClientSecret == "" {
+		return nil, fmt.Errorf("Credentials.ClientSecret must be set")
+	}
 	if config.Tenant == "" {
 		return nil, fmt.Errorf("Tenant must be set")
 	}

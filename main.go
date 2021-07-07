@@ -15,12 +15,18 @@ func main() {
 			ClientSecret: os.Getenv("DSV_CLIENT_SECRET"),
 		},
 		Tenant: os.Getenv("DSV_TENANT"),
+		TLD:    os.Getenv("DSV_TLD"),
 	})
+
+	if err != nil {
+		log.Fatalf("failed to configure vault: %v", err)
+	}
+
 	secret, err := dsv.Secret("path:of:the:secret")
 
 	if err != nil {
-		log.Fatal("failure calling vault.Secret", err)
+		log.Fatalf("failed to fetch secret: %v", err)
 	}
 
-	fmt.Print("the SSH public key is", secret.Data["public"])
+	fmt.Printf("secret data: %v", secret.Data)
 }
