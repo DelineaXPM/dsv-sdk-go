@@ -42,7 +42,7 @@ type Configuration struct {
 	Tenant, TLD, URLTemplate string
 }
 
-// Vault provides access to secrets stored in Thycotic DSV
+// Vault provides access to secrets stored in Delinea DSV
 type Vault struct {
 	Configuration
 }
