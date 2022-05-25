@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/thycotic/dsv-sdk-go/vault"
+	"github.com/DelineaXPM/dsv-sdk-go/vault"
 )
 
 func main() {
