@@ -1,3 +1,3 @@
-module github.com/thycotic/dsv-sdk-go
+module github.com/DelineaXPM/dsv-sdk-go
 
 go 1.13
