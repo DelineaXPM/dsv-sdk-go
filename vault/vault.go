@@ -3,16 +3,25 @@ package vault
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/DelineaXPM/dsv-sdk-go/v2/auth"
 )
 
 const (
 	defaultTLD         string = "com"
 	defaultURLTemplate string = "https://%s.secretsvaultcloud.%s/v1/%s%s"
+)
+
+var (
+	errClientId     = errors.New("Credentials.ClientID must be set")
+	errClientSecret = errors.New("Credentials.ClientSecret must be set")
+	errTenant       = errors.New("tenant must be set")
 )
 
 // resourceMetadata are fields common to all complex resources
@@ -40,23 +49,27 @@ type ClientCredential struct {
 type Configuration struct {
 	Credentials              ClientCredential
 	Tenant, TLD, URLTemplate string
+	Provider                 auth.Provider
 }
 
-// Vault provides access to secrets stored in Delinea DSV
+// Vault provides access to secrets stored in Thycotic DSV
 type Vault struct {
 	Configuration
 }
 
 // New returns a Vault or an error if the Configuration is invalid
 func New(config Configuration) (*Vault, error) {
-	if config.Credentials.ClientID == "" {
-		return nil, fmt.Errorf("Credentials.ClientID must be set")
+	if config.Provider == auth.CLIENT {
+		if config.Credentials.ClientID == "" {
+			return nil, errClientId
+		}
+		if config.Credentials.ClientSecret == "" {
+			return nil, errClientSecret
+		}
 	}
-	if config.Credentials.ClientSecret == "" {
-		return nil, fmt.Errorf("Credentials.ClientSecret must be set")
-	}
+
 	if config.Tenant == "" {
-		return nil, fmt.Errorf("Tenant must be set")
+		return nil, errTenant
 	}
 	if config.TLD == "" {
 		config.TLD = defaultTLD
@@ -64,6 +77,7 @@ func New(config Configuration) (*Vault, error) {
 	if config.URLTemplate == "" {
 		config.URLTemplate = defaultURLTemplate
 	}
+
 	return &Vault{config}, nil
 }
 
@@ -117,18 +131,43 @@ func (v Vault) accessResource(method, resource, path string, input interface{}) 
 	return data, err
 }
 
+type accessTokenRequest struct {
+	GrantType    string `json:"grant_type"`
+	Provider     string `json:"provider"`
+	Password     string `json:"password"`
+	ClientID     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+	RefreshToken string `json:"refresh_token"`
+	AwsBody      string `json:"aws_body"`
+	AwsHeaders   string `json:"aws_headers"`
+}
+
 // getAccessToken uses the client_id and client_secret, to call the token
 // endpoint and get an accessGrant.
 func (v Vault) getAccessToken() (string, error) {
-	grantRequest, err := json.Marshal(struct {
-		GrantType    string `json:"grant_type"`
-		ClientID     string `json:"client_id"`
-		ClientSecret string `json:"client_secret"`
-	}{
-		"client_credentials",
-		v.Credentials.ClientID,
-		v.Credentials.ClientSecret,
-	})
+	var rBody accessTokenRequest
+	switch v.Provider {
+	case auth.AWS:
+		auth, err := auth.New(auth.Config{Provider: auth.AWS})
+		if err != nil {
+			return "", err
+		}
+		header, body, err := auth.GetSTSHeaderAndBody()
+		if err != nil {
+			return "", err
+		}
+
+		rBody.GrantType = "aws_iam"
+		rBody.AwsHeaders = header
+		rBody.AwsBody = body
+
+	default:
+		rBody.GrantType = "client_credentials"
+		rBody.ClientID = v.Credentials.ClientID
+		rBody.ClientSecret = v.Credentials.ClientSecret
+	}
+
+	request, err := json.Marshal(&rBody)
 
 	if err != nil {
 		log.Print("[WARN] marshalling grantRequest")
@@ -137,11 +176,7 @@ func (v Vault) getAccessToken() (string, error) {
 
 	url := v.urlFor("token", "")
 
-	log.Printf("[DEBUG] calling %s with client_id %s", url, v.Credentials.ClientID)
-
-	data, err := handleResponse(http.Post(url, "application/json",
-		bytes.NewReader(grantRequest)))
-
+	response, err := handleResponse(http.Post(url, "application/json", bytes.NewReader(request)))
 	if err != nil {
 		log.Print("[DEBUG] grant response error:", err)
 		return "", err
@@ -153,10 +188,11 @@ func (v Vault) getAccessToken() (string, error) {
 		// TODO cache the grant until it expires
 	}{}
 
-	if err = json.Unmarshal(data, &grant); err != nil {
+	if err = json.Unmarshal(response, &grant); err != nil {
 		log.Print("[INFO] parsing grant response:", err)
 		return "", err
 	}
+
 	return grant.AccessToken, nil
 }
 
