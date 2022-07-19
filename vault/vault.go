@@ -52,7 +52,7 @@ type Configuration struct {
 	Provider                 auth.Provider
 }
 
-// Vault provides access to secrets stored in Thycotic DSV
+// Vault provides access to secrets stored in Delinea DSV
 type Vault struct {
 	Configuration
 }
