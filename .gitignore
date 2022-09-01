@@ -25,4 +25,14 @@
 # End of https://www.gitignore.io/api/go
 
 # IDE
-.vscode
+
+./artifacts
+**/*/*.exe
+**/*/bin
+.env
+artifacts/
+tools
+.artifacts
+_artifacts
+**/*/bin
+mage_output_file.go
