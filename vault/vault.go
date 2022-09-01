@@ -84,13 +84,6 @@ func New(config Configuration) (*Vault, error) {
 // accessResource uses the accessToken to access the API resource.
 // It assumes an appropriate combination of method, resource, path and input.
 func (v Vault) accessResource(method, resource, path string, input interface{}) ([]byte, error) {
-	accessToken, err := v.getAccessToken()
-
-	if err != nil {
-		log.Print("[DEBUG] error getting accessToken:", err)
-		return nil, err
-	}
-
 	switch resource {
 	case clientsResource, rolesResource, secretsResource:
 	default:
@@ -98,6 +91,12 @@ func (v Vault) accessResource(method, resource, path string, input interface{}) 
 
 		log.Printf("[DEBUG] %s: %s", message, resource)
 		return nil, fmt.Errorf(message)
+	}
+
+	accessToken, err := v.getAccessToken()
+	if err != nil {
+		log.Print("[DEBUG] error getting accessToken:", err)
+		return nil, err
 	}
 
 	body := bytes.NewBuffer([]byte{})
