@@ -87,10 +87,7 @@ func (v Vault) accessResource(method, resource, path string, input interface{}) 
 	switch resource {
 	case clientsResource, rolesResource, secretsResource:
 	default:
-		message := "unrecognized resource"
-
-		log.Printf("[DEBUG] %s: %s", message, resource)
-		return nil, fmt.Errorf(message)
+		return nil, fmt.Errorf("unrecognized resource: %s", resource)
 	}
 
 	accessToken, err := v.getAccessToken()
