@@ -40,7 +40,6 @@
   "go.formatTool": "gofumpt",
   "gopls": {
     "formatting.gofumpt": true,
-    "formatting.local": "ras",
     "buildFlags": [
       "-tags=mage tools integration" // required for gopls to autocomplete mage files with mage tag
     ],
