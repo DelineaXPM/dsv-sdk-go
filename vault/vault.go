@@ -143,6 +143,10 @@ type accessTokenRequest struct {
 	AwsHeaders string `json:"aws_headers,omitempty"`
 }
 
+type accessTokenResponse struct {
+	AccessToken string `json:"accessToken"`
+}
+
 // getAccessToken uses the client_id and client_secret, to call the token
 // endpoint and get an accessGrant.
 func (v Vault) getAccessToken() (string, error) {
@@ -169,7 +173,6 @@ func (v Vault) getAccessToken() (string, error) {
 	}
 
 	request, err := json.Marshal(&rBody)
-
 	if err != nil {
 		log.Print("[WARN] marshalling grantRequest")
 		return "", err
@@ -183,18 +186,14 @@ func (v Vault) getAccessToken() (string, error) {
 		return "", err
 	}
 
-	grant := struct {
-		AccessToken, TokenType string
-		ExpiresIn              int
-		// TODO cache the grant until it expires
-	}{}
-
-	if err = json.Unmarshal(response, &grant); err != nil {
+	// TODO: cache the token until it expires.
+	resp := &accessTokenResponse{}
+	if err = json.Unmarshal(response, &resp); err != nil {
 		log.Print("[INFO] parsing grant response:", err)
 		return "", err
 	}
 
-	return grant.AccessToken, nil
+	return resp.AccessToken, nil
 }
 
 // urlFor the URL of the given resource and path in the current Vault
