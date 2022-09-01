@@ -25,4 +25,28 @@
 # End of https://www.gitignore.io/api/go
 
 # IDE
-.vscode
+
+./artifacts
+**/*/*.exe
+**/*/bin
+.env
+artifacts/
+tools
+.artifacts
+_artifacts
+**/*/bin
+mage_output_file.go
+
+# Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
+
+./artifacts
+**/*/*.exe
+**/*/bin
+.env
+artifacts/
+tools
+.artifacts
+_artifacts
+**/*/bin
+mage_output_file.go
+dist/
