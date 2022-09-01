@@ -143,8 +143,7 @@ type accessTokenResponse struct {
 	AccessToken string `json:"accessToken"`
 }
 
-// getAccessToken uses the client_id and client_secret, to call the token
-// endpoint and get an accessGrant.
+// getAccessToken returns access token fetched from DSV.
 func (v Vault) getAccessToken() (string, error) {
 	var rBody accessTokenRequest
 	switch v.Provider {
