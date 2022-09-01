@@ -132,14 +132,15 @@ func (v Vault) accessResource(method, resource, path string, input interface{}) 
 }
 
 type accessTokenRequest struct {
-	GrantType    string `json:"grant_type"`
-	Provider     string `json:"provider"`
-	Password     string `json:"password"`
-	ClientID     string `json:"client_id"`
-	ClientSecret string `json:"client_secret"`
-	RefreshToken string `json:"refresh_token"`
-	AwsBody      string `json:"aws_body"`
-	AwsHeaders   string `json:"aws_headers"`
+	GrantType string `json:"grant_type"`
+
+	// Fields for "client_credentials" grant type.
+	ClientID     string `json:"client_id,omitempty"`
+	ClientSecret string `json:"client_secret,omitempty"`
+
+	// Fields for "aws_iam" grant type.
+	AwsBody    string `json:"aws_body,omitempty"`
+	AwsHeaders string `json:"aws_headers,omitempty"`
 }
 
 // getAccessToken uses the client_id and client_secret, to call the token
