@@ -3,6 +3,7 @@ package vault
 import (
 	"encoding/json"
 	"log"
+	"net/http"
 )
 
 // clientsResource is the HTTP URL path component for the clients resource
@@ -25,7 +26,7 @@ type Client struct {
 // Client gets the client with id from the DSV of the given tenant
 func (v Vault) Client(id string) (*Client, error) {
 	client := &Client{vault: v}
-	data, err := v.accessResource("GET", clientsResource, id, nil)
+	data, err := v.accessResource(http.MethodGet, clientsResource, id, nil)
 
 	if err != nil {
 		return nil, err
@@ -40,7 +41,7 @@ func (v Vault) Client(id string) (*Client, error) {
 
 // Delete deletes the client from the DSV of the given tenant
 func (c Client) Delete() error {
-	if _, err := c.vault.accessResource("DELETE", clientsResource, c.ClientID, nil); err != nil {
+	if _, err := c.vault.accessResource(http.MethodDelete, clientsResource, c.ClientID, nil); err != nil {
 		return err
 	}
 
@@ -49,7 +50,7 @@ func (c Client) Delete() error {
 
 // New creates a new Client given a roleName
 func (v Vault) New(client *Client) error {
-	data, err := v.accessResource("POST", clientsResource, "/", client)
+	data, err := v.accessResource(http.MethodPost, clientsResource, "/", client)
 
 	if err != nil {
 		return err
