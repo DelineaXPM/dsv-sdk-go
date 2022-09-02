@@ -20,7 +20,6 @@ type secretResource struct {
 type Secret struct {
 	resourceMetadata
 	secretResource
-	vault Vault
 }
 
 // Secret gets the secret at path from the DSV of the given tenant
@@ -30,7 +29,7 @@ func (v Vault) Secret(path string) (*Secret, error) {
 		return nil, err
 	}
 
-	secret := &Secret{vault: v}
+	secret := &Secret{}
 	if err := json.Unmarshal(data, secret); err != nil {
 		log.Printf("[DEBUG] error parsing response from /%s/%s: %q", secretsResource, path, data)
 		return nil, err
