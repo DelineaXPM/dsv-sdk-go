@@ -25,13 +25,12 @@ type Client struct {
 
 // Client gets the client with id from the DSV of the given tenant
 func (v Vault) Client(id string) (*Client, error) {
-	client := &Client{vault: v}
 	data, err := v.accessResource(http.MethodGet, clientsResource, id, nil)
-
 	if err != nil {
 		return nil, err
 	}
 
+	client := &Client{vault: v}
 	if err := json.Unmarshal(data, client); err != nil {
 		log.Printf("[DEBUG] error parsing response from /%s/%s: %q", clientsResource, id, data)
 		return nil, err
@@ -44,14 +43,12 @@ func (c Client) Delete() error {
 	if _, err := c.vault.accessResource(http.MethodDelete, clientsResource, c.ClientID, nil); err != nil {
 		return err
 	}
-
 	return nil
 }
 
 // New creates a new Client given a roleName
 func (v Vault) New(client *Client) error {
 	data, err := v.accessResource(http.MethodPost, clientsResource, "/", client)
-
 	if err != nil {
 		return err
 	}
@@ -60,6 +57,5 @@ func (v Vault) New(client *Client) error {
 		log.Printf("[DEBUG] error parsing response from /%s: %q", clientsResource, data)
 		return err
 	}
-
 	return nil
 }
