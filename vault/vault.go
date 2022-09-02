@@ -115,7 +115,7 @@ func (v Vault) accessResource(method, resource, path string, input interface{}) 
 
 	req.Header.Add("Authorization", "Bearer "+accessToken)
 	switch method {
-	case "POST", "PUT":
+	case http.MethodPost, http.MethodPut:
 		req.Header.Set("Content-Type", "application/json")
 	}
 
@@ -168,23 +168,20 @@ func (v Vault) getAccessToken() (string, error) {
 
 	request, err := json.Marshal(&rBody)
 	if err != nil {
-		log.Print("[WARN] marshalling grantRequest")
-		return "", err
+		return "", fmt.Errorf("marshalling token request body: %w", err)
 	}
 
 	url := v.urlFor("token", "")
 
 	response, err := handleResponse(http.Post(url, "application/json", bytes.NewReader(request)))
 	if err != nil {
-		log.Print("[DEBUG] grant response error:", err)
-		return "", err
+		return "", fmt.Errorf("fetching token: %w", err)
 	}
 
 	// TODO: cache the token until it expires.
 	resp := &accessTokenResponse{}
 	if err = json.Unmarshal(response, &resp); err != nil {
-		log.Print("[INFO] parsing grant response:", err)
-		return "", err
+		return "", fmt.Errorf("unmarshalling token response: %w", err)
 	}
 
 	return resp.AccessToken, nil
