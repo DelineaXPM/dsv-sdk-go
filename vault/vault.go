@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -96,25 +97,23 @@ func (v Vault) accessResource(method, resource, path string, input interface{}) 
 		return nil, err
 	}
 
-	body := bytes.NewBuffer([]byte{})
-
+	var body io.Reader
 	if input != nil {
-		if data, err := json.Marshal(input); err == nil {
-			body = bytes.NewBuffer(data)
-		} else {
+		data, err := json.Marshal(input)
+		if err != nil {
 			log.Print("[DEBUG] marshaling the request body to JSON:", err)
 			return nil, err
 		}
+		body = bytes.NewReader(data)
 	}
 
 	req, err := http.NewRequest(method, v.urlFor(resource, path), body)
-	req.Header.Add("Authorization", "Bearer "+accessToken)
-
 	if err != nil {
 		log.Printf("[DEBUG] creating req: %s /%s/%s: %s", method, resource, path, err)
 		return nil, err
 	}
 
+	req.Header.Add("Authorization", "Bearer "+accessToken)
 	switch method {
 	case "POST", "PUT":
 		req.Header.Set("Content-Type", "application/json")
