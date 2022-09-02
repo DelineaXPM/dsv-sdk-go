@@ -3,6 +3,7 @@ package vault
 import (
 	"encoding/json"
 	"log"
+	"net/http"
 )
 
 // secretsResource is the HTTP URL path component for the secrets resource
@@ -24,13 +25,12 @@ type Secret struct {
 
 // Secret gets the secret at path from the DSV of the given tenant
 func (v Vault) Secret(path string) (*Secret, error) {
-	secret := &Secret{vault: v}
-	data, err := v.accessResource("GET", secretsResource, path, nil)
-
+	data, err := v.accessResource(http.MethodGet, secretsResource, path, nil)
 	if err != nil {
 		return nil, err
 	}
 
+	secret := &Secret{vault: v}
 	if err := json.Unmarshal(data, secret); err != nil {
 		log.Printf("[DEBUG] error parsing response from /%s/%s: %q", secretsResource, path, data)
 		return nil, err
