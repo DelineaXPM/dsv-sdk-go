@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -84,43 +85,37 @@ func New(config Configuration) (*Vault, error) {
 // accessResource uses the accessToken to access the API resource.
 // It assumes an appropriate combination of method, resource, path and input.
 func (v Vault) accessResource(method, resource, path string, input interface{}) ([]byte, error) {
-	accessToken, err := v.getAccessToken()
-
-	if err != nil {
-		log.Print("[DEBUG] error getting accessToken:", err)
-		return nil, err
-	}
-
 	switch resource {
 	case clientsResource, rolesResource, secretsResource:
 	default:
-		message := "unrecognized resource"
-
-		log.Printf("[DEBUG] %s: %s", message, resource)
-		return nil, fmt.Errorf(message)
+		return nil, fmt.Errorf("unrecognized resource: %s", resource)
 	}
 
-	body := bytes.NewBuffer([]byte{})
+	accessToken, err := v.getAccessToken()
+	if err != nil {
+		log.Print("[DEBUG] error getting accessToken: ", err)
+		return nil, err
+	}
 
+	var body io.Reader
 	if input != nil {
-		if data, err := json.Marshal(input); err == nil {
-			body = bytes.NewBuffer(data)
-		} else {
+		data, err := json.Marshal(input)
+		if err != nil {
 			log.Print("[DEBUG] marshaling the request body to JSON:", err)
 			return nil, err
 		}
+		body = bytes.NewReader(data)
 	}
 
 	req, err := http.NewRequest(method, v.urlFor(resource, path), body)
-	req.Header.Add("Authorization", "Bearer "+accessToken)
-
 	if err != nil {
 		log.Printf("[DEBUG] creating req: %s /%s/%s: %s", method, resource, path, err)
 		return nil, err
 	}
 
+	req.Header.Add("Authorization", "Bearer "+accessToken)
 	switch method {
-	case "POST", "PUT":
+	case http.MethodPost, http.MethodPut:
 		req.Header.Set("Content-Type", "application/json")
 	}
 
@@ -132,18 +127,22 @@ func (v Vault) accessResource(method, resource, path string, input interface{}) 
 }
 
 type accessTokenRequest struct {
-	GrantType    string `json:"grant_type"`
-	Provider     string `json:"provider"`
-	Password     string `json:"password"`
-	ClientID     string `json:"client_id"`
-	ClientSecret string `json:"client_secret"`
-	RefreshToken string `json:"refresh_token"`
-	AwsBody      string `json:"aws_body"`
-	AwsHeaders   string `json:"aws_headers"`
+	GrantType string `json:"grant_type"`
+
+	// Fields for "client_credentials" grant type.
+	ClientID     string `json:"client_id,omitempty"`
+	ClientSecret string `json:"client_secret,omitempty"`
+
+	// Fields for "aws_iam" grant type.
+	AwsBody    string `json:"aws_body,omitempty"`
+	AwsHeaders string `json:"aws_headers,omitempty"`
 }
 
-// getAccessToken uses the client_id and client_secret, to call the token
-// endpoint and get an accessGrant.
+type accessTokenResponse struct {
+	AccessToken string `json:"accessToken"`
+}
+
+// getAccessToken returns access token fetched from DSV.
 func (v Vault) getAccessToken() (string, error) {
 	var rBody accessTokenRequest
 	switch v.Provider {
@@ -168,32 +167,24 @@ func (v Vault) getAccessToken() (string, error) {
 	}
 
 	request, err := json.Marshal(&rBody)
-
 	if err != nil {
-		log.Print("[WARN] marshalling grantRequest")
-		return "", err
+		return "", fmt.Errorf("marshalling token request body: %w", err)
 	}
 
 	url := v.urlFor("token", "")
 
 	response, err := handleResponse(http.Post(url, "application/json", bytes.NewReader(request)))
 	if err != nil {
-		log.Print("[DEBUG] grant response error:", err)
-		return "", err
+		return "", fmt.Errorf("fetching token: %w", err)
 	}
 
-	grant := struct {
-		AccessToken, TokenType string
-		ExpiresIn              int
-		// TODO cache the grant until it expires
-	}{}
-
-	if err = json.Unmarshal(response, &grant); err != nil {
-		log.Print("[INFO] parsing grant response:", err)
-		return "", err
+	// TODO: cache the token until it expires.
+	resp := &accessTokenResponse{}
+	if err = json.Unmarshal(response, &resp); err != nil {
+		return "", fmt.Errorf("unmarshalling token response: %w", err)
 	}
 
-	return grant.AccessToken, nil
+	return resp.AccessToken, nil
 }
 
 // urlFor the URL of the given resource and path in the current Vault
