@@ -93,7 +93,7 @@ func (v Vault) accessResource(method, resource, path string, input interface{}) 
 
 	accessToken, err := v.getAccessToken()
 	if err != nil {
-		log.Print("[DEBUG] error getting accessToken:", err)
+		log.Print("[DEBUG] error getting accessToken: ", err)
 		return nil, err
 	}
 
