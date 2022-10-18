@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go v1.44.56
 	github.com/magefile/mage v1.14.0
 	github.com/pterm/pterm v0.12.45
-	github.com/sheldonhull/magetools v0.0.12
+	github.com/sheldonhull/magetools v1.0.0
 )
 
 require (
