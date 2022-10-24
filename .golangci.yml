@@ -1,0 +1,196 @@
+---
+output:
+  format: tab
+linters-settings:
+  misspell:
+    locale: US
+  gomnd:
+    settings:
+      mnd:
+        checks: [argument, case, condition, return]
+        ignored-functions: strconv.ParseFloat,rsa.GenerateKey
+  nolintlint:
+    allow-unused: false
+    allow-leading-space: true
+    allow-no-explanation: []
+    require-explanation: true
+    require-specific: true
+  gofumpt:
+    lang-version: "1.18"
+    extra-rules: true
+  godox:
+    keywords:
+      - OPTIMIZE
+      - HACK
+      - TODO
+      - BUG
+      - FIXME
+  godot:
+    scope: all
+    exclude:
+      - //nolint
+      - (API)
+      - ^[ ]*@
+    capital: true
+  depguard:
+    list-type: blacklist
+    include-go-root: true
+    includeGoStdLib: true
+    packages:
+      - github.com/sirupsen/logrus
+    packages-with-error-message:
+      - github.com/sirupsen/logrus: logging is allowed only by zerolog. Please use zerolog
+      - io/ioutil: "io/ioutil was deprecated in Go 1.16: https://tip.golang.org/doc/go1.16"
+    gomodguard:
+      blocked:
+        modules:
+          - github.com/sirupsen/logrus:
+              recommendations:
+                - internal/logging
+              reason: logging is allowed only by zerolog. Please use zerolog
+        local_replace_directives: false
+  tagliatelle:
+    case:
+      use-field-name: true
+      rules:
+        json: kebab
+        yaml: kebab
+        xml: camel
+        bson: camel
+        avro: snake
+        mapstructure: kebab
+    errcheck:
+      check-type-assertions: true
+      check-blank: false
+      ignore: fmt:.*,io/ioutil:^Read.*
+      exclude-functions:
+        - io/ioutil.ReadFile
+        - io.Copy(*bytes.Buffer)
+        - io.Copy(os.Stdout)
+        - io.Closer.Close
+        - io.Closer.Body.Close
+  govet:
+    enable-all: true
+    check-shadowing: true
+    disable:
+      - fieldalignment
+    settings:
+      printf:
+        funcs:
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
+  varnamelen:
+    max-distance: 15
+    min-name-length: 3
+    check-receiver: false
+    check-return: false
+    ignore-type-assert-ok: true
+    ignore-map-index-ok: true
+    ignore-chan-recv-ok: true
+    ignore-names:
+      - err
+      - tt
+      - i
+      - x
+      - id
+      - b
+      - ok
+      - zl
+      - fs
+    disable:
+      - fieldalignment
+  revive:
+    ignore-generated-header: true
+    enableAllRules: true
+    exclude:
+      - .*_test.go
+    rules:
+      - name: var-naming
+        severity: error
+linters:
+  exclude-use-default: false
+  enable-all: true
+  disable:
+    - scopelint
+    - paralleltest
+    - noctx
+    - wsl
+    - lll
+    - interfacer
+    - golint
+    - maligned
+    - goimports
+    - gci
+    - gofmt
+    - nlreturn
+    - gofumpt
+    - exhaustivestruct
+    - exhaustruct
+    - wrapcheck
+    - godox
+    - execinquery
+    - nonamedreturns
+    - forbidigo
+    - structcheck
+    - varcheck
+    - deadcode
+    - ifshort
+    - godox
+    - godot
+    - nosnakecase
+    - rowserrcheck # disabled due to generics, can enable in future if needed
+    - sqlclosecheck # disabled due to generics, can enable in future if needed
+    - wastedassign # disabled due to generics, can enable in future if needed
+run:
+  skip-dirs-use-default: true
+  skip-dirs:
+    - build
+    - artifacts
+    - _tools
+    - vendor
+    - vendor$
+  build-tags:
+    - mage
+    - tools
+    - integration
+    - codeanalysis
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - goerr113
+        - wrapcheck
+        - funlen
+        - cyclop
+        - gocognit
+        - unparam
+        - varnamelen
+        - revive
+    - linters:
+        - goerr113
+      text: do not define dynamic errors
+    - path: magefiles
+      linters:
+        - goerr113
+        - wrapcheck
+        - funlen
+        - gocyclo
+        - cyclop
+        - gocognit
+        - maintidx
+        - deadcode
+        - gochecknoglobals
+    - linters:
+        - goerr113
+      text: magefiles don't need to worry about wrapping in the same way
+    - linters:
+        - govet
+        - revive
+      text: "shadow: declaration of .err. shadows declaration"
+    - path: mocks
+      linters:
+        - godot
+      text: mocked files do not need to be checked
+  whole-files: false
