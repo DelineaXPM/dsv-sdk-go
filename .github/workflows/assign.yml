@@ -4,10 +4,6 @@ on:
   # pull_request: # For testing changes in branch
   pull_request_target:
     types: [opened, ready_for_review]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.action }}
-  cancel-in-progress: true
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:

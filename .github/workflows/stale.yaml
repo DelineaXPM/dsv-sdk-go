@@ -8,10 +8,6 @@ permissions:
   issues: write
   pull-requests: write
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.action }}
-  cancel-in-progress: true
-
 jobs:
   stale:
     uses: delineaxpm/github-workflows/.github/workflows/stale.yml@main
