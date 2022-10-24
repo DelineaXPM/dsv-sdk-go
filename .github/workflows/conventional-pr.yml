@@ -7,6 +7,9 @@ on:
       - opened
       - edited
       - synchronize
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.action }}
+  cancel-in-progress: true
 permissions:
   pull-requests: read
 env:
