@@ -54,6 +54,6 @@ actions:
     - id: gotestsum
       runtime: go
       description: run go tests on pre-push
-      run: gotestsum --format pkgname -- -shuffle=on  -tags integration ./...
+      run: gotestsum --format pkgname -- -shuffle=on -tags integration ./...
       triggers:
         - git_hooks: [pre-push]
