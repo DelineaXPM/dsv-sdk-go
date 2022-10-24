@@ -12,13 +12,7 @@ import (
 	"github.com/sheldonhull/magetools/tooling"
 
 	// mage:import
-	"github.com/sheldonhull/magetools/gittools"
-	// mage:import
 	"github.com/sheldonhull/magetools/gotools"
-	// mage:import
-	"github.com/sheldonhull/magetools/precommit"
-	//mage:import
-	_ "github.com/sheldonhull/magetools/secrets"
 )
 
 // createDirectories creates the local working directories for build artifacts and tooling.
@@ -56,10 +50,7 @@ func Init() error { //nolint:deadcode // Not dead, it's alive.
 		return err
 	}
 	// These can run in parallel as different toolchains.
-	mg.Deps(
-		(gittools.Gittools{}.Init),
-		(precommit.Precommit{}.Init),
-	)
+	mg.Deps()
 	return nil
 }
 
