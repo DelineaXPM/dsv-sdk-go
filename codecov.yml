@@ -15,9 +15,9 @@ coverage:
         target: auto # auto compares coverage to the previous base commit
 # sample regex patterns
 ignore:
-  - "magefiles"
-  - "examples"
-  - ".trunk"
-  - ".vscode"
-  - ".devcontainer"
-  - "vendor"
+  - 'magefiles'
+  - 'examples'
+  - '.trunk'
+  - '.vscode'
+  - '.devcontainer'
+  - 'vendor'
