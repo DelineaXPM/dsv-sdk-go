@@ -1,7 +1,6 @@
 ---
 name: assign
 on:
-  # pull_request: # For testing changes in branch
   pull_request_target:
     types: [opened, ready_for_review]
 env:
