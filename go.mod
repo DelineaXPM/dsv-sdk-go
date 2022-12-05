@@ -3,7 +3,7 @@ module github.com/DelineaXPM/dsv-sdk-go/v2
 go 1.18
 
 require (
-	github.com/aws/aws-sdk-go v1.44.119
+	github.com/aws/aws-sdk-go v1.44.152
 	github.com/magefile/mage v1.14.0
 	github.com/pterm/pterm v0.12.49
 	github.com/sheldonhull/magetools v1.0.0
