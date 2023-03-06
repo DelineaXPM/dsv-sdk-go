@@ -1,7 +1,7 @@
 # atomicgo.dev/cursor v0.1.1
 ## explicit; go 1.15
 atomicgo.dev/cursor
-# atomicgo.dev/keyboard v0.2.8
+# atomicgo.dev/keyboard v0.2.9
 ## explicit; go 1.15
 atomicgo.dev/keyboard
 atomicgo.dev/keyboard/internal
@@ -85,11 +85,11 @@ github.com/magefile/mage/sh
 # github.com/mattn/go-runewidth v0.0.14
 ## explicit; go 1.9
 github.com/mattn/go-runewidth
-# github.com/pterm/pterm v0.12.49
+# github.com/pterm/pterm v0.12.55
 ## explicit; go 1.18
 github.com/pterm/pterm
 github.com/pterm/pterm/internal
-# github.com/rivo/uniseg v0.4.2
+# github.com/rivo/uniseg v0.4.4
 ## explicit; go 1.18
 github.com/rivo/uniseg
 # github.com/sheldonhull/magetools v1.0.0
@@ -105,22 +105,22 @@ github.com/xo/terminfo
 # github.com/ztrue/tracerr v0.3.0
 ## explicit
 github.com/ztrue/tracerr
-# golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
+# golang.org/x/mod v0.8.0
 ## explicit; go 1.17
 golang.org/x/mod/internal/lazyregexp
 golang.org/x/mod/modfile
 golang.org/x/mod/module
 golang.org/x/mod/semver
-# golang.org/x/sys v0.1.0
+# golang.org/x/sys v0.6.0
 ## explicit; go 1.17
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/term v0.1.0
+# golang.org/x/term v0.5.0
 ## explicit; go 1.17
 golang.org/x/term
-# golang.org/x/text v0.4.0
+# golang.org/x/text v0.8.0
 ## explicit; go 1.17
 golang.org/x/text/cases
 golang.org/x/text/internal
