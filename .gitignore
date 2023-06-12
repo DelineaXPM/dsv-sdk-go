@@ -50,3 +50,4 @@ _artifacts
 **/*/bin
 mage_output_file.go
 dist/
+/test_config.json
