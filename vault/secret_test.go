@@ -1,16 +1,27 @@
 //go:build integration
 package vault
 
-import "testing"
+import (
+	"testing"
+	"math/rand"
+	"time"
+)
 
-const secretName = "/test/secret"
+const letterBytes = "abcdefghijklmnopqrstuvwxyz"
 
-// TestSecret tests Secret
+func init() {
+    rand.Seed(time.Now().UnixNano())
+}
+
 func TestSecret(t *testing.T) {
-	secret, err := dsv.Secret(secretName)
+	path := makeRandomSecretPath()
+	_, cleanup := createSecret(t, path)
+	defer cleanup()
+
+	secret, err := dsv.Secret(path)
 
 	if err != nil {
-		t.Error("calling secrets.Secret:", err)
+		t.Fatalf("Secret for path=%s: %s", path, err)
 		return
 	}
 
@@ -21,11 +32,16 @@ func TestSecret(t *testing.T) {
 
 
 func TestCreateSecret(t *testing.T) {
-	secret, err := createSecret(secretName)
+	path := makeRandomSecretPath()
+	secret, err := dsv.CreateSecret(
+		path, SecretRequest{Data: map[string]interface{}{"foo": "bar"}},
+	)
 
 	if err != nil {
-		t.Error("calling secrets.CreateSecret:", err)
+		t.Fatalf("CreateSecret for path=%s: %s", path, err)
 		return
+	} else {
+		defer func() { deleteSecret(t, path) }()
 	}
 
 	if secret.Data == nil {
@@ -34,17 +50,42 @@ func TestCreateSecret(t *testing.T) {
 }
 
 func TestDeleteSecret(t *testing.T) {
-	createSecret("temporary")
-	err := dsv.DeleteSecret("temporary")
+	path := makeRandomSecretPath()
+	_, _ = createSecret(t, path) // no cleanup required as test tries to delete anyway
 
+	err := dsv.DeleteSecret(path)
 	if err != nil {
-		t.Error("calling secrets.DeleteSecret:", err)
-		return
+		t.Errorf("DeleteSecret for path=%s: %s", path, err)
 	}
 }
 
-func createSecret(name string) (*Secret, error) {
-	return dsv.CreateSecret(name, SecretRequest{Data: map[string]interface{}{
+// createSecret creates a secret with given path and returns the created secret as well
+// as a cleanup function which should be deferred to remove the secret from the vault.
+func createSecret(t *testing.T, path string) (s *Secret, cleanup func()) {
+	t.Helper()
+	s, err := dsv.CreateSecret(path, SecretRequest{Data: map[string]interface{}{
 		"foo": "bar",
 	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	cleanup = func() { deleteSecret(t, path) }
+	return
+}
+
+// deleteSecret deletes the secret given by path from the vault.
+func deleteSecret(t *testing.T, path string) {
+	t.Helper()
+	if err := dsv.DeleteSecret(path); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// makeRandomSecretPath creates a pseudo-random secret path.
+func makeRandomSecretPath() string {
+	b := make([]byte, 10)
+    for i := range b {
+        b[i] = letterBytes[rand.Intn(len(letterBytes))]
+    }
+	return "/test/"+string(b)
 }

@@ -53,14 +53,8 @@ Create `test_config.json`:
 const roleName = "test-role"
 ```
 
-`vault/secret_test.go` declares:
-
-```golang
-const secretName = "/test/secret"
-```
-
-The tests assume that `roleName` can exists and has privilege to create, read,
-and delete a client, and read `secretName`.
+The tests assume that `roleName` exists and has privilege to create, read,
+and delete a client, as well as create, read and delete secrets with a `test:` path prefix.
 
 ## Use
 
