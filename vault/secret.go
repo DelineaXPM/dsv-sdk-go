@@ -45,16 +45,16 @@ func (v Vault) DeleteSecret(path string) error {
 	return err
 }
 
-// SecretRequest represents the request body of the CreateSecret operation.
-type SecretRequest struct {
-	Attributes map[string]interface{}
-	Data       map[string]interface{}
-	Description string
+// SecretCreateRequest represents the request body of the CreateSecret operation.
+type SecretCreateRequest struct {
+	Attributes  map[string]interface{} `json:"attributes"`
+	Data        map[string]interface{} `json:"data"`
+	Description string                 `json:"description"`
 }
 
 // CreateSecret creates the secret at path in the DSV of the given tenant.
 // See https://dsv.secretsvaultcloud.com/api#operation/createSecret.
-func (v Vault) CreateSecret(path string, req SecretRequest) (*Secret, error) {
+func (v Vault) CreateSecret(path string, req SecretCreateRequest) (*Secret, error) {
 	d, err := v.accessResource(http.MethodPost, secretsResource, path, req)
 	if err != nil {
 		return nil, err

@@ -34,7 +34,7 @@ func TestSecret(t *testing.T) {
 func TestCreateSecret(t *testing.T) {
 	path := makeRandomSecretPath()
 	secret, err := dsv.CreateSecret(
-		path, SecretRequest{Data: map[string]interface{}{"foo": "bar"}},
+		path, SecretCreateRequest{Data: map[string]interface{}{"foo": "bar"}},
 	)
 
 	if err != nil {
@@ -63,7 +63,7 @@ func TestDeleteSecret(t *testing.T) {
 // as a cleanup function which should be deferred to remove the secret from the vault.
 func createSecret(t *testing.T, path string) (s *Secret, cleanup func()) {
 	t.Helper()
-	s, err := dsv.CreateSecret(path, SecretRequest{Data: map[string]interface{}{
+	s, err := dsv.CreateSecret(path, SecretCreateRequest{Data: map[string]interface{}{
 		"foo": "bar",
 	}})
 	if err != nil {
