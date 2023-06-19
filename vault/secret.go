@@ -54,7 +54,7 @@ type SecretCreateRequest struct {
 
 // CreateSecret creates the secret at path in the DSV of the given tenant.
 // See https://dsv.secretsvaultcloud.com/api#operation/createSecret.
-func (v Vault) CreateSecret(path string, req SecretCreateRequest) (*Secret, error) {
+func (v Vault) CreateSecret(path string, req *SecretCreateRequest) (*Secret, error) {
 	d, err := v.accessResource(http.MethodPost, secretsResource, path, req)
 	if err != nil {
 		return nil, err
