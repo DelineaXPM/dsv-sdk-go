@@ -33,7 +33,7 @@ lint:
         - .changes/unreleased/*.yaml
 runtimes:
   enabled:
-    - go@1.18.3
+    - go@1.20.3
     - node@16.14.2
     - python@3.10.3
 actions:
@@ -54,6 +54,6 @@ actions:
     - id: gotestsum
       runtime: go
       description: run go tests on pre-push
-      run: gotestsum --format pkgname -- -shuffle=on -tags integration ./...
+      run: gotestsum --format pkgname -- -shuffle=on ./...
       triggers:
         - git_hooks: [pre-push]

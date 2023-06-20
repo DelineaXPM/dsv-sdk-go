@@ -1,0 +1,5 @@
+kind: "\U0001F9EA Tests"
+body:
+  Add build tag to test files `integration`. This will ensure local go tests don't
+  run integration tests as default or in trunk `pre-push` triggered checks.
+time: 2023-06-20T17:56:01.842149-05:00
