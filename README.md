@@ -37,11 +37,11 @@ Create `test_config.json`:
 
 ```json
 {
-    "credentials": {
-        "clientId": "93d866d4-635f-4d4e-9ce3-0ef7f879f319",
-        "clientSecret": "xxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxx-xxxxx"
-    },
-    "tenant": "mytenant"
+  "credentials": {
+    "clientId": "",
+    "clientSecret": ""
+  },
+  "tenant": "mytenant"
 }
 ```
 
