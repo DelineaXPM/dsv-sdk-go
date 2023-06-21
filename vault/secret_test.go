@@ -2,15 +2,15 @@
 package vault
 
 import (
-	"testing"
 	"math/rand"
+	"testing"
 	"time"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyz"
 
 func init() {
-    rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 }
 
 func TestSecret(t *testing.T) {
@@ -29,7 +29,6 @@ func TestSecret(t *testing.T) {
 		t.Error("secret.Data is nil")
 	}
 }
-
 
 func TestCreateSecret(t *testing.T) {
 	path := makeRandomSecretPath()
@@ -84,8 +83,8 @@ func deleteSecret(t *testing.T, path string) {
 // makeRandomSecretPath creates a pseudo-random secret path.
 func makeRandomSecretPath() string {
 	b := make([]byte, 10)
-    for i := range b {
-        b[i] = letterBytes[rand.Intn(len(letterBytes))]
-    }
-	return "/test/"+string(b)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return "/test/" + string(b)
 }
