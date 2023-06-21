@@ -22,8 +22,9 @@ type Secret struct {
 	secretResource
 }
 
-// Secret gets the secret at path from the DSV of the given tenant.
-// See https://dsv.secretsvaultcloud.com/api#operation/getSecret.
+// Secret [gets the secret] at path from the DSV of the given tenant.
+//
+// [gets the secret]: https://dsv.secretsvaultcloud.com/api#operation/getSecret
 func (v Vault) Secret(path string) (*Secret, error) {
 	data, err := v.accessResource(http.MethodGet, secretsResource, path, nil)
 	if err != nil {
@@ -38,8 +39,9 @@ func (v Vault) Secret(path string) (*Secret, error) {
 	return secret, nil
 }
 
-// DeleteSecret deletes the secret at path from the DSV of the given tenant.
-// See https://dsv.secretsvaultcloud.com/api#operation/deleteSecret.
+// DeleteSecret [deletes the secret] at path from the DSV of the given tenant.
+//
+// [deletes the secret]: https://dsv.secretsvaultcloud.com/api#operation/deleteSecret
 func (v Vault) DeleteSecret(path string) error {
 	_, err := v.accessResource(http.MethodDelete, secretsResource, path, nil)
 	return err
@@ -52,8 +54,9 @@ type SecretCreateRequest struct {
 	Description string                 `json:"description"`
 }
 
-// CreateSecret creates the secret at path in the DSV of the given tenant.
-// See https://dsv.secretsvaultcloud.com/api#operation/createSecret.
+// CreateSecret [creates the secret] at path in the DSV of the given tenant.
+//
+// [creates the secret]: https://dsv.secretsvaultcloud.com/api#operation/createSecret
 func (v Vault) CreateSecret(path string, req *SecretCreateRequest) (*Secret, error) {
 	d, err := v.accessResource(http.MethodPost, secretsResource, path, req)
 	if err != nil {
