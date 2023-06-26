@@ -74,3 +74,14 @@ if err != nil {
 
 fmt.Print("the SSH public key is", secret.Data["public"])
 ```
+
+## Contributors
+
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- readme: collaborators,contributors -start -->
+<!-- readme: collaborators,contributors -end -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
