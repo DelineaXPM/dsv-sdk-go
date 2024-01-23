@@ -2,8 +2,6 @@ module github.com/DelineaXPM/dsv-sdk-go/v2
 
 go 1.21
 
-toolchain go1.21.6
-
 require (
 	github.com/aws/aws-sdk-go v1.49.21
 	github.com/magefile/mage v1.15.0
