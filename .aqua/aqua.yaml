@@ -3,7 +3,7 @@
 # https://aquaproj.github.io/
 registries:
   - type: standard
-    ref: v4.119.0 # renovate: depName=aquaproj/aqua-registry
+    ref: v4.123.0 # renovate: depName=aquaproj/aqua-registry
 packages:
   - name: miniscruff/changie@v1.18.0
     tags: ['release']
@@ -16,8 +16,8 @@ packages:
   - name: goreleaser/goreleaser@v1.23.0
     tags: ['release']
   - name: mvdan/gofumpt@v0.5.0
-  - name: anchore/syft@v0.100.0
+  - name: anchore/syft@v0.101.1
     tags: ['release']
-  - name: thycotic/dsv-cli@v1.40.5
+  - name: thycotic/dsv-cli@v1.40.6
   - name: gotestyourself/gotestsum@v1.11.0
     tags: ['test']
