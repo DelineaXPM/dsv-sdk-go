@@ -8,8 +8,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"math"
-	"os"
 	"strings"
 	"time"
 
@@ -58,11 +56,6 @@ type Configuration struct {
 // Vault provides access to secrets stored in Delinea DSV
 type Vault struct {
 	Configuration
-}
-
-type TokenCache struct {
-	AccessToken string `json:"access_token"`
-	ExpiresIn   int    `json:"expires_in"`
 }
 
 // New returns a Vault or an error if the Configuration is invalid
@@ -147,42 +140,10 @@ type accessTokenRequest struct {
 
 type accessTokenResponse struct {
 	AccessToken string `json:"accessToken"`
-	ExpiresIn   int `json:"expiresIn"`
-}
-
-func (v Vault) setCacheAccessToken(value string, expiresIn int) error {
-	cache := TokenCache{}
-	cache.AccessToken = value
-	cache.ExpiresIn = (int(time.Now().Unix()) + expiresIn) - int(math.Floor(float64(expiresIn)*0.9))
-
-	data, _ := json.Marshal(cache)
-	os.Setenv("SS_AT", string(data))
-	return nil
-}
-
-func (v Vault) getCacheAccessToken() (string, bool) {
-	data, ok := os.LookupEnv("SS_AT")
-	if !ok {
-		os.Setenv("SS_AT", "")
-		return "", ok
-	}
-	fmt.Println("FOUND CACHED TOKEN")
-	cache := TokenCache{}
-	if err := json.Unmarshal([]byte(data), &cache); err != nil {
-		return "", false
-	}
-	if time.Now().Unix() < int64(cache.ExpiresIn) {
-		return cache.AccessToken, true
-	}
-	return "", false
 }
 
 // getAccessToken returns access token fetched from DSV.
 func (v Vault) getAccessToken() (string, error) {
-	accessToken, found := v.getCacheAccessToken()
-	if found {
-		return accessToken, nil
-	}
 	var rBody accessTokenRequest
 	switch v.Provider {
 	case auth.AWS:
@@ -217,15 +178,11 @@ func (v Vault) getAccessToken() (string, error) {
 		return "", fmt.Errorf("fetching token: %w", err)
 	}
 
-	fmt.Println(string(response))
 	// TODO: cache the token until it expires.
 	resp := &accessTokenResponse{}
 	if err = json.Unmarshal(response, &resp); err != nil {
 		return "", fmt.Errorf("unmarshalling token response: %w", err)
 	}
-
-	fmt.Printf("%+v", resp)
-	v.setCacheAccessToken(resp.AccessToken, resp.ExpiresIn)
 
 	return resp.AccessToken, nil
 }
