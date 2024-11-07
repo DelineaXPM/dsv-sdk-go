@@ -150,15 +150,17 @@ type accessTokenResponse struct {
 	ExpiresIn   int    `json:"expiresIn"`
 }
 
-func (v Vault) setCacheAccessToken(value string, expiresIn int) error {
-
+func (v Vault) setCacheAccessToken(value string, expiresIn int) bool {
 	cache := TokenCache{}
 	cache.AccessToken = value
 	cache.ExpiresIn = (int(time.Now().Unix()) + expiresIn) - int(math.Floor(float64(expiresIn)*0.9))
 
-	data, _ := json.Marshal(cache)
+	data, err := json.Marshal(cache)
+	if err != nil {
+		return false
+	}
 	os.Setenv("SS_AT", string(data))
-	return nil
+	return true
 }
 
 func (v Vault) getCacheAccessToken() (string, bool) {
@@ -222,7 +224,10 @@ func (v Vault) getAccessToken() (string, error) {
 	if err = json.Unmarshal(response, &resp); err != nil {
 		return "", fmt.Errorf("unmarshalling token response: %w", err)
 	}
-	v.setCacheAccessToken(resp.AccessToken, resp.ExpiresIn)
+	ok := v.setCacheAccessToken(resp.AccessToken, resp.ExpiresIn)
+	if !ok {
+		return "", fmt.Errorf("unable to cache access token")
+	}
 	return resp.AccessToken, nil
 }
 
