@@ -51,3 +51,5 @@ _artifacts
 mage_output_file.go
 dist/
 /test_config.json
+test.go
+.DS_Store
