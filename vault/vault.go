@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"math"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -147,7 +147,7 @@ type accessTokenRequest struct {
 
 type accessTokenResponse struct {
 	AccessToken string `json:"accessToken"`
-	ExpiresIn   int `json:"expiresIn"`
+	ExpiresIn   int    `json:"expiresIn"`
 }
 
 func (v Vault) setCacheAccessToken(value string, expiresIn int) error {
