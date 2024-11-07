@@ -151,9 +151,10 @@ type accessTokenResponse struct {
 }
 
 func (v Vault) setCacheAccessToken(value string, expiresIn int) bool {
+	percentage := 0.9
 	cache := TokenCache{}
 	cache.AccessToken = value
-	cache.ExpiresIn = (int(time.Now().Unix()) + expiresIn) - int(math.Floor(float64(expiresIn)*0.9))
+	cache.ExpiresIn = (int(time.Now().Unix()) + expiresIn) - int(math.Floor(float64(expiresIn)*percentage))
 
 	data, err := json.Marshal(cache)
 	if err != nil {
@@ -209,7 +210,6 @@ func (v Vault) getAccessToken() (string, error) {
 
 	request, err := json.Marshal(&rBody)
 	if err != nil {
-		return "", fmt.Errorf("marshalling token request body: %w", err)
 	}
 
 	url := v.urlFor("token", "")
@@ -222,7 +222,7 @@ func (v Vault) getAccessToken() (string, error) {
 	// TODO: cache the token until it expires.
 	resp := &accessTokenResponse{}
 	if err = json.Unmarshal(response, &resp); err != nil {
-		return "", fmt.Errorf("unmarshalling token response: %w", err)
+		return "", fmt.Errorf("unmarshaling token response: %w", err)
 	}
 	ok := v.setCacheAccessToken(resp.AccessToken, resp.ExpiresIn)
 	if !ok {
