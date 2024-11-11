@@ -60,6 +60,7 @@ type Vault struct {
 	Configuration
 }
 
+//nolint:tagliatelle // the json is coming from an external API call
 type TokenCache struct {
 	AccessToken string `json:"access_token"`
 	ExpiresIn   int    `json:"expires_in"`
@@ -145,6 +146,7 @@ type accessTokenRequest struct {
 	AwsHeaders string `json:"aws_headers,omitempty"`
 }
 
+//nolint:tagliatelle // the json is coming from an external API call
 type accessTokenResponse struct {
 	AccessToken string `json:"accessToken"`
 	ExpiresIn   int    `json:"expiresIn"`
