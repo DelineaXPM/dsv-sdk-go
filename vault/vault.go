@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -56,6 +58,12 @@ type Configuration struct {
 // Vault provides access to secrets stored in Delinea DSV
 type Vault struct {
 	Configuration
+}
+
+//nolint:tagliatelle // the json is coming from an external API call
+type TokenCache struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn   int    `json:"expires_in"`
 }
 
 // New returns a Vault or an error if the Configuration is invalid
@@ -138,12 +146,48 @@ type accessTokenRequest struct {
 	AwsHeaders string `json:"aws_headers,omitempty"`
 }
 
+//nolint:tagliatelle // the json is coming from an external API call
 type accessTokenResponse struct {
 	AccessToken string `json:"accessToken"`
+	ExpiresIn   int    `json:"expiresIn"`
+}
+
+func (v Vault) setCacheAccessToken(value string, expiresIn int) bool {
+	percentage := 0.9
+	cache := TokenCache{}
+	cache.AccessToken = value
+	cache.ExpiresIn = (int(time.Now().Unix()) + expiresIn) - int(math.Floor(float64(expiresIn)*percentage))
+
+	data, err := json.Marshal(cache)
+	if err != nil {
+		return false
+	}
+	os.Setenv("SS_AT", string(data))
+	return true
+}
+
+func (v Vault) getCacheAccessToken() (string, bool) {
+	data, ok := os.LookupEnv("SS_AT")
+	if !ok {
+		os.Setenv("SS_AT", "")
+		return "", ok
+	}
+	cache := TokenCache{}
+	if err := json.Unmarshal([]byte(data), &cache); err != nil {
+		return "", false
+	}
+	if time.Now().Unix() < int64(cache.ExpiresIn) {
+		return cache.AccessToken, true
+	}
+	return "", false
 }
 
 // getAccessToken returns access token fetched from DSV.
 func (v Vault) getAccessToken() (string, error) {
+	accessToken, found := v.getCacheAccessToken()
+	if found {
+		return accessToken, nil
+	}
 	var rBody accessTokenRequest
 	switch v.Provider {
 	case auth.AWS:
@@ -168,7 +212,6 @@ func (v Vault) getAccessToken() (string, error) {
 
 	request, err := json.Marshal(&rBody)
 	if err != nil {
-		return "", fmt.Errorf("marshalling token request body: %w", err)
 	}
 
 	url := v.urlFor("token", "")
@@ -181,9 +224,12 @@ func (v Vault) getAccessToken() (string, error) {
 	// TODO: cache the token until it expires.
 	resp := &accessTokenResponse{}
 	if err = json.Unmarshal(response, &resp); err != nil {
-		return "", fmt.Errorf("unmarshalling token response: %w", err)
+		return "", fmt.Errorf("unmarshaling token response: %w", err)
 	}
-
+	ok := v.setCacheAccessToken(resp.AccessToken, resp.ExpiresIn)
+	if !ok {
+		return "", fmt.Errorf("unable to cache access token")
+	}
 	return resp.AccessToken, nil
 }
 
