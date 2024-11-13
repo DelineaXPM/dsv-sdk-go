@@ -98,13 +98,6 @@ fmt.Print("the SSH public key is", secret.Data["public"])
         </a>
     </td>
     <td align="center">
-        <a href="https://github.com/EndlessTrax">
-            <img src="https://avatars.githubusercontent.com/u/17141891?v=4" width="100;" alt="EndlessTrax"/>
-            <br />
-            <sub><b>Ricky White</b></sub>
-        </a>
-    </td>
-    <td align="center">
         <a href="https://github.com/maxsokolovsky">
             <img src="https://avatars.githubusercontent.com/u/17733533?v=4" width="100;" alt="maxsokolovsky"/>
             <br />
@@ -124,6 +117,13 @@ fmt.Print("the SSH public key is", secret.Data["public"])
             <br />
             <sub><b>Andrii Zakurenyi</b></sub>
         </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/pacificcode">
+            <img src="https://avatars.githubusercontent.com/u/918320?v=4" width="100;" alt="pacificcode"/>
+            <br />
+            <sub><b>Bill Hamilton</b></sub>
+        </a>
     </td></tr>
 <tr>
     <td align="center">
@@ -131,6 +131,13 @@ fmt.Print("the SSH public key is", secret.Data["public"])
             <img src="https://avatars.githubusercontent.com/u/215455?v=4" width="100;" alt="michaelsauter"/>
             <br />
             <sub><b>Michael Sauter</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/EndlessTrax">
+            <img src="https://avatars.githubusercontent.com/u/17141891?v=4" width="100;" alt="EndlessTrax"/>
+            <br />
+            <sub><b>Ricky White</b></sub>
         </a>
     </td>
     <td align="center">
