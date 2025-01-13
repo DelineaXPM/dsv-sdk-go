@@ -13,11 +13,11 @@ import (
 func main() {
 	dsv, err := vault.New(vault.Configuration{
 		Credentials: vault.ClientCredential{
-			ClientID:     os.Getenv("AZURE_CLIENT_ID"), // CLIENT_ID of the MSI identity you wish to use
+			ClientID: os.Getenv("AZURE_CLIENT_ID"), // CLIENT_ID of the MSI identity you wish to use
 		},
-		Tenant: os.Getenv("DSV_TENANT"), // your tenant name 
-		TLD:    os.Getenv("DSV_TLD"), // defaults to com change if your domain is au, eu etc  
-		Provider: auth.AZURE, // required to enable Azure authentication
+		Tenant:   os.Getenv("DSV_TENANT"), // your tenant name
+		TLD:      os.Getenv("DSV_TLD"),    // defaults to com change if your domain is au, eu etc
+		Provider: auth.AZURE,              // required to enable Azure authentication
 	})
 	if err != nil {
 		log.Fatalf("failed to configure vault: %v", err)

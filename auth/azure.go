@@ -12,18 +12,18 @@ import (
 type AuthType string
 
 type requestBody struct {
-	GrantType          string `json:"grant_type"`
-	Jwt                string `json:"jwt,omitempty"`
+	GrantType string `json:"grant_type"`
+	Jwt       string `json:"jwt,omitempty"`
 }
 
 // Types of supported authentication.
 const (
-	FederatedAzure   = AuthType("azure")
+	FederatedAzure = AuthType("azure")
 )
 
 // authTypeToGrantType maps authentication type to grant type which will be sent to DSV.
 var authTypeToGrantType = map[AuthType]string{
-	FederatedAzure:   "azure",
+	FederatedAzure: "azure",
 }
 
 func (a *authorization) BuildAzureParams() (*requestBody, error) {

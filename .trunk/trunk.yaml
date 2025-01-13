@@ -1,25 +1,29 @@
 version: 0.1
 cli:
-  version: 1.19.0
+  version: 1.22.8
 plugins:
   sources:
     - id: trunk
-      ref: v1.2.1
+      ref: v1.6.6
       uri: https://github.com/trunk-io/plugins
 lint:
   enabled:
-    - shellcheck@0.9.0
+    - checkov@3.2.352
+    - osv-scanner@1.9.2
+    - renovate@39.106.0
+    - trufflehog@3.88.2
+    - shellcheck@0.10.0
     - gofmt@1.20.4
-    - taplo@0.8.1
-    - gitleaks@8.18.1
-    - actionlint@1.6.26
+    - taplo@0.9.3
+    - gitleaks@8.22.1
+    - actionlint@1.7.6
     - shfmt@3.6.0
     - git-diff-check
-    - prettier@3.2.4
-    - yamllint@1.33.0
-    - golangci-lint@1.55.2
-    - hadolint@2.12.0
-    - markdownlint@0.38.0
+    - prettier@3.4.2
+    - yamllint@1.35.1
+    - golangci-lint@1.63.4
+    - hadolint@2.12.1-beta
+    - markdownlint@0.43.0
   threshold:
     - linters: [markdownlint]
       level: high
@@ -34,7 +38,7 @@ lint:
 runtimes:
   enabled:
     - go@1.21.6
-    - node@18.12.1
+    - node@18.20.5
     - python@3.10.8
 actions:
   enabled:

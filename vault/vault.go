@@ -146,7 +146,7 @@ type accessTokenRequest struct {
 	AwsHeaders string `json:"aws_headers,omitempty"`
 
 	// Fields for "Azure" grant type.
-	Jwt    string `json:"jwt,omitempty"`
+	Jwt string `json:"jwt,omitempty"`
 }
 
 //nolint:tagliatelle // the json is coming from an external API call
