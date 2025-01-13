@@ -209,7 +209,6 @@ func (v Vault) getAccessToken() (string, error) {
 	case auth.AZURE:
 		auth, _ := auth.New(auth.Config{Provider: auth.AZURE})
 		data, err := auth.BuildAzureParams()
-		fmt.Printf("DATA = %+v", data)
 		if err != nil {
 			return "", err
 		}
