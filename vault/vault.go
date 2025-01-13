@@ -144,6 +144,9 @@ type accessTokenRequest struct {
 	// Fields for "aws_iam" grant type.
 	AwsBody    string `json:"aws_body,omitempty"`
 	AwsHeaders string `json:"aws_headers,omitempty"`
+
+	// Fields for "Azure" grant type.
+	Jwt    string `json:"jwt,omitempty"`
 }
 
 //nolint:tagliatelle // the json is coming from an external API call
@@ -162,14 +165,14 @@ func (v Vault) setCacheAccessToken(value string, expiresIn int) bool {
 	if err != nil {
 		return false
 	}
-	os.Setenv("SS_AT", string(data))
+	os.Setenv("DSV_AT", string(data))
 	return true
 }
 
 func (v Vault) getCacheAccessToken() (string, bool) {
-	data, ok := os.LookupEnv("SS_AT")
+	data, ok := os.LookupEnv("DSV_AT")
 	if !ok {
-		os.Setenv("SS_AT", "")
+		os.Setenv("DSV_AT", "")
 		return "", ok
 	}
 	cache := TokenCache{}
@@ -203,25 +206,30 @@ func (v Vault) getAccessToken() (string, error) {
 		rBody.GrantType = "aws_iam"
 		rBody.AwsHeaders = header
 		rBody.AwsBody = body
-
+	case auth.AZURE:
+		auth, _ := auth.New(auth.Config{Provider: auth.AZURE})
+		data, err := auth.BuildAzureParams()
+		fmt.Printf("DATA = %+v", data)
+		if err != nil {
+			return "", err
+		}
+		rBody.GrantType = data.GrantType
+		rBody.Jwt = data.Jwt
 	default:
 		rBody.GrantType = "client_credentials"
 		rBody.ClientID = v.Credentials.ClientID
 		rBody.ClientSecret = v.Credentials.ClientSecret
 	}
-
 	request, err := json.Marshal(&rBody)
 	if err != nil {
 	}
 
 	url := v.urlFor("token", "")
-
 	response, err := handleResponse(http.Post(url, "application/json", bytes.NewReader(request)))
 	if err != nil {
 		return "", fmt.Errorf("fetching token: %w", err)
 	}
 
-	// TODO: cache the token until it expires.
 	resp := &accessTokenResponse{}
 	if err = json.Unmarshal(response, &resp); err != nil {
 		return "", fmt.Errorf("unmarshaling token response: %w", err)
