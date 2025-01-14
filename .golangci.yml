@@ -16,7 +16,7 @@ linters-settings:
     require-explanation: true
     require-specific: true
   gofumpt:
-    lang-version: "1.18"
+    lang-version: '1.18'
     extra-rules: true
   godox:
     keywords:
@@ -33,14 +33,16 @@ linters-settings:
       - ^[ ]*@
     capital: true
   depguard:
-    list-type: blacklist
-    include-go-root: true
-    includeGoStdLib: true
-    packages:
-      - github.com/sirupsen/logrus
+    rules:
+      main:
+        files:
+          - $all
+        deny:
+          - pkg: 'github.com/sirupsen/logrus'
+            desc: 'logging is standardised via yunikorn logger and zap'
     packages-with-error-message:
       - github.com/sirupsen/logrus: logging is allowed only by zerolog. Please use zerolog
-      - io/ioutil: "io/ioutil was deprecated in Go 1.16: https://tip.golang.org/doc/go1.16"
+      - io/ioutil: 'io/ioutil was deprecated in Go 1.16: https://tip.golang.org/doc/go1.16'
     gomodguard:
       blocked:
         modules:
@@ -188,7 +190,7 @@ issues:
     - linters:
         - govet
         - revive
-      text: "shadow: declaration of .err. shadows declaration"
+      text: 'shadow: declaration of .err. shadows declaration'
     - path: mocks
       linters:
         - godot
