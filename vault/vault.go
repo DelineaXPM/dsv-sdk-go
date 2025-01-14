@@ -235,7 +235,7 @@ func (v Vault) getAccessToken() (string, error) {
 	}
 	ok := v.setCacheAccessToken(resp.AccessToken, resp.ExpiresIn)
 	if !ok {
-		return "", fmt.Errorf("unable to cache access token")
+		return "", errors.New("unable to cache access token")
 	}
 	return resp.AccessToken, nil
 }

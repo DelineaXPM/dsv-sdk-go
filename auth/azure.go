@@ -21,6 +21,10 @@ const (
 	FederatedAzure = AuthType("azure")
 )
 
+var (
+	ErrInvalidToken = errors.New("received invalid bearer token")
+)
+
 // authTypeToGrantType maps authentication type to grant type which will be sent to DSV.
 var authTypeToGrantType = map[AuthType]string{
 	FederatedAzure: "azure",
@@ -44,7 +48,7 @@ func (a *authorization) BuildAzureParams() (*requestBody, error) {
 	qualifiedBearer := r.Header.Get("Authorization")
 	lenPrefix := len("Bearer ")
 	if len(qualifiedBearer) < lenPrefix {
-		return nil, errors.New("received invalid bearer token")
+		return nil, ErrInvalidToken
 	}
 	bearer := qualifiedBearer[lenPrefix:]
 

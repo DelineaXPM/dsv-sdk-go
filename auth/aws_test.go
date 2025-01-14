@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"reflect"
@@ -11,7 +12,6 @@ import (
 )
 
 func TestGetSTSHeaderAndBody(t *testing.T) {
-
 	testCases := []struct {
 		name              string
 		getCallerIdentity func() *request.Request
@@ -22,7 +22,8 @@ func TestGetSTSHeaderAndBody(t *testing.T) {
 		{"good Response", func() *request.Request {
 			return &request.Request{HTTPRequest: &http.Request{
 				Header: http.Header{},
-				Body:   io.NopCloser(strings.NewReader("Test data"))}}
+				Body:   io.NopCloser(strings.NewReader("Test data")),
+			}}
 		}, "e30=", "VGVzdCBkYXRh", nil},
 	}
 
@@ -32,7 +33,7 @@ func TestGetSTSHeaderAndBody(t *testing.T) {
 
 		header, body, err := ath.GetSTSHeaderAndBody()
 
-		if err != tt.expectedError {
+		if !errors.Is(err, tt.expectedError) {
 			t.Error("unexpected err", err)
 		}
 
@@ -43,7 +44,5 @@ func TestGetSTSHeaderAndBody(t *testing.T) {
 		if !reflect.DeepEqual(body, tt.expectedBody) {
 			t.Error("unexpected body", body)
 		}
-
 	}
-
 }

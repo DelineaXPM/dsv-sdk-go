@@ -14,13 +14,11 @@ func main() {
 		Tenant:   os.Getenv("DSV_TENANT"),
 		Provider: auth.AWS,
 	})
-
 	if err != nil {
 		log.Fatalf("failed to configure vault: %v", err)
 	}
 
 	secret, err := dsv.Secret("your secret path")
-
 	if err != nil {
 		log.Fatalf("failed to fetch secret: %v", err)
 	}
