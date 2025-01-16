@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -12,6 +13,7 @@ func handleResponse(res *http.Response, err error) ([]byte, error) {
 		return nil, err
 	}
 
+	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
@@ -21,5 +23,5 @@ func handleResponse(res *http.Response, err error) ([]byte, error) {
 	if res.StatusCode > 199 && res.StatusCode < 300 {
 		return data, nil
 	}
-	return nil, fmt.Errorf("%s: %s", res.Status, string(data))
+	return nil, errors.New(fmt.Sprintf("%s: %s", res.Status, string(data)))
 }

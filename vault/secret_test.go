@@ -84,7 +84,7 @@ func deleteSecret(t *testing.T, path string) {
 func makeRandomSecretPath() string {
 	b := make([]byte, 10)
 	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+		b[i] = letterBytes[rand.Intn(len(letterBytes))] //nolint
 	}
 	return "test:" + string(b)
 }

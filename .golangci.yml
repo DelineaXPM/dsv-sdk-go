@@ -115,33 +115,22 @@ linters:
   exclude-use-default: false
   enable-all: true
   disable:
-    - scopelint
     - paralleltest
     - noctx
     - wsl
     - lll
-    - interfacer
-    - golint
-    - maligned
     - goimports
     - gci
     - gofmt
     - nlreturn
     - gofumpt
-    - exhaustivestruct
     - exhaustruct
     - wrapcheck
     - godox
-    - execinquery
     - nonamedreturns
     - forbidigo
-    - structcheck
-    - varcheck
-    - deadcode
-    - ifshort
     - godox
     - godot
-    - nosnakecase
     - rowserrcheck # disabled due to generics, can enable in future if needed
     - sqlclosecheck # disabled due to generics, can enable in future if needed
     - wastedassign # disabled due to generics, can enable in future if needed

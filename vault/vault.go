@@ -22,7 +22,7 @@ const (
 )
 
 var (
-	errClientId     = errors.New("Credentials.ClientID must be set")
+	errClientID     = errors.New("Credentials.ClientID must be set")
 	errClientSecret = errors.New("Credentials.ClientSecret must be set")
 	errTenant       = errors.New("tenant must be set")
 )
@@ -70,7 +70,7 @@ type TokenCache struct {
 func New(config Configuration) (*Vault, error) {
 	if config.Provider == auth.CLIENT {
 		if config.Credentials.ClientID == "" {
-			return nil, errClientId
+			return nil, errClientID
 		}
 		if config.Credentials.ClientSecret == "" {
 			return nil, errClientSecret
@@ -96,7 +96,7 @@ func (v Vault) accessResource(method, resource, path string, input interface{}) 
 	switch resource {
 	case clientsResource, rolesResource, secretsResource:
 	default:
-		return nil, fmt.Errorf("unrecognized resource: %s", resource)
+		return nil, errors.New(fmt.Sprintf("unrecognized resource: %s", resource))
 	}
 
 	accessToken, err := v.getAccessToken()
@@ -186,12 +186,15 @@ func (v Vault) getCacheAccessToken() (string, bool) {
 }
 
 // getAccessToken returns access token fetched from DSV.
+//
+//nolint:cyclop
 func (v Vault) getAccessToken() (string, error) {
 	accessToken, found := v.getCacheAccessToken()
 	if found {
 		return accessToken, nil
 	}
 	var rBody accessTokenRequest
+	//nolint:exhaustive
 	switch v.Provider {
 	case auth.AWS:
 		auth, err := auth.New(auth.Config{Provider: auth.AWS})
@@ -224,7 +227,7 @@ func (v Vault) getAccessToken() (string, error) {
 	}
 
 	url := v.urlFor("token", "")
-	response, err := handleResponse(http.Post(url, "application/json", bytes.NewReader(request)))
+	response, err := handleResponse(http.Post(url, "application/json", bytes.NewReader(request))) //nolint
 	if err != nil {
 		return "", fmt.Errorf("fetching token: %w", err)
 	}
@@ -235,7 +238,8 @@ func (v Vault) getAccessToken() (string, error) {
 	}
 	ok := v.setCacheAccessToken(resp.AccessToken, resp.ExpiresIn)
 	if !ok {
-		return "", errors.New("unable to cache access token")
+		var errCache = errors.New("unable to cache access token")
+		return "", errCache
 	}
 	return resp.AccessToken, nil
 }
