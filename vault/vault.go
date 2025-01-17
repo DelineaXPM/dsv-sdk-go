@@ -19,10 +19,11 @@ import (
 const (
 	defaultTLD         string = "com"
 	defaultURLTemplate string = "https://%s.secretsvaultcloud.%s/v1/%s%s"
+	dsvEnvVar          string = "DSV_AT"
 )
 
 var (
-	errClientId     = errors.New("Credentials.ClientID must be set")
+	errClientID     = errors.New("Credentials.ClientID must be set")
 	errClientSecret = errors.New("Credentials.ClientSecret must be set")
 	errTenant       = errors.New("tenant must be set")
 )
@@ -70,7 +71,7 @@ type TokenCache struct {
 func New(config Configuration) (*Vault, error) {
 	if config.Provider == auth.CLIENT {
 		if config.Credentials.ClientID == "" {
-			return nil, errClientId
+			return nil, errClientID
 		}
 		if config.Credentials.ClientSecret == "" {
 			return nil, errClientSecret
@@ -144,6 +145,9 @@ type accessTokenRequest struct {
 	// Fields for "aws_iam" grant type.
 	AwsBody    string `json:"aws_body,omitempty"`
 	AwsHeaders string `json:"aws_headers,omitempty"`
+
+	// Fields for "Azure" grant type.
+	Jwt string `json:"jwt,omitempty"`
 }
 
 //nolint:tagliatelle // the json is coming from an external API call
@@ -162,14 +166,14 @@ func (v Vault) setCacheAccessToken(value string, expiresIn int) bool {
 	if err != nil {
 		return false
 	}
-	os.Setenv("SS_AT", string(data))
+	_ = os.Setenv(dsvEnvVar, string(data))
 	return true
 }
 
 func (v Vault) getCacheAccessToken() (string, bool) {
-	data, ok := os.LookupEnv("SS_AT")
+	data, ok := os.LookupEnv(dsvEnvVar)
 	if !ok {
-		os.Setenv("SS_AT", "")
+		_ = os.Setenv(dsvEnvVar, "")
 		return "", ok
 	}
 	cache := TokenCache{}
@@ -183,12 +187,15 @@ func (v Vault) getCacheAccessToken() (string, bool) {
 }
 
 // getAccessToken returns access token fetched from DSV.
+//
+//nolint:cyclop //function is not overly complex :)
 func (v Vault) getAccessToken() (string, error) {
 	accessToken, found := v.getCacheAccessToken()
 	if found {
 		return accessToken, nil
 	}
 	var rBody accessTokenRequest
+	//nolint:exhaustive //not necessary
 	switch v.Provider {
 	case auth.AWS:
 		auth, err := auth.New(auth.Config{Provider: auth.AWS})
@@ -203,25 +210,29 @@ func (v Vault) getAccessToken() (string, error) {
 		rBody.GrantType = "aws_iam"
 		rBody.AwsHeaders = header
 		rBody.AwsBody = body
-
+	case auth.AZURE:
+		ath, _ := auth.New(auth.Config{Provider: auth.AZURE})
+		data, err := ath.BuildAzureParams()
+		if err != nil {
+			return "", err
+		}
+		rBody.GrantType = data.GrantType
+		rBody.Jwt = data.Jwt
 	default:
 		rBody.GrantType = "client_credentials"
 		rBody.ClientID = v.Credentials.ClientID
 		rBody.ClientSecret = v.Credentials.ClientSecret
 	}
-
 	request, err := json.Marshal(&rBody)
 	if err != nil {
 	}
 
 	url := v.urlFor("token", "")
-
 	response, err := handleResponse(http.Post(url, "application/json", bytes.NewReader(request)))
 	if err != nil {
 		return "", fmt.Errorf("fetching token: %w", err)
 	}
 
-	// TODO: cache the token until it expires.
 	resp := &accessTokenResponse{}
 	if err = json.Unmarshal(response, &resp); err != nil {
 		return "", fmt.Errorf("unmarshaling token response: %w", err)

@@ -1,4 +1,5 @@
 //go:build integration
+
 package vault
 
 import "testing"
@@ -9,7 +10,6 @@ func TestClient(t *testing.T) {
 	t.Run("TestNewClient", func(t *testing.T) {
 		client := &Client{clientResource: clientResource{RoleName: roleName}}
 		err := dsv.New(client)
-
 		if err != nil {
 			t.Errorf("calling clients.New(\"%s\"): %s", roleName, err)
 			return
@@ -23,7 +23,6 @@ func TestClient(t *testing.T) {
 	})
 	t.Run("TestGetClient", func(t *testing.T) {
 		client, err := dsv.Client(config.Credentials.ClientID)
-
 		if err != nil {
 			t.Errorf("calling clients.Client(\"%s\"): %s", ID, err)
 			return
@@ -36,7 +35,6 @@ func TestClient(t *testing.T) {
 	})
 	t.Run("TestDeleteClient", func(t *testing.T) {
 		client, err := dsv.Client(ID)
-
 		if err != nil {
 			t.Errorf("calling clients.Client(\"%s\"): %s", ID, err)
 			return

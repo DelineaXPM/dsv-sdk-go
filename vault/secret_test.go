@@ -1,4 +1,5 @@
 //go:build integration
+
 package vault
 
 import (
@@ -19,7 +20,6 @@ func TestSecret(t *testing.T) {
 	defer cleanup()
 
 	secret, err := dsv.Secret(path)
-
 	if err != nil {
 		t.Fatalf("Secret for path=%s: %s", path, err)
 		return
