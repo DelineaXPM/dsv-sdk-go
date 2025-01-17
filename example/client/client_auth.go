@@ -27,5 +27,5 @@ func main() {
 		log.Printf("failed to fetch secret: %v", err)
 		os.Exit(exitCode)
 	}
-	fmt.Printf("secret data: %v", secret.Data)
+	log.Printf("secret data: %v", secret.Data)
 }
