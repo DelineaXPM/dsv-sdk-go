@@ -12,7 +12,7 @@ var config = func() *Configuration {
 	if cj, err := ioutil.ReadFile("../test_config.json"); err == nil {
 		c := new(Configuration)
 
-		_ = json.Unmarshal(cj, &c)
+		_ = json.Unmarshal(cj, &c) //nolint:musttag //dynamic struct
 		return c
 	}
 	return &Configuration{

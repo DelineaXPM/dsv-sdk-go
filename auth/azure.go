@@ -9,27 +9,17 @@ import (
 	azure "github.com/Azure/go-autorest/autorest/azure/auth"
 )
 
-type AuthType string
-
 type requestBody struct {
 	GrantType string `json:"grant_type"`
 	Jwt       string `json:"jwt,omitempty"`
 }
 
-// Types of supported authentication.
-const (
-	FederatedAzure = AuthType("azure")
-)
-
 var (
 	ErrInvalidToken = errors.New("received invalid bearer token")
 )
 
+//nolint:revive //used as part of the auth mod in vault.go
 func (a *authorization) BuildAzureParams() (*requestBody, error) {
-	// authTypeToGrantType maps authentication type to grant type which will be sent to DSV.
-	var authTypeToGrantType = map[AuthType]string{
-		FederatedAzure: "azure",
-	}
 	resource := "https://management.azure.com/"
 	authorizer, err := azure.NewAuthorizerFromEnvironmentWithResource(resource)
 	if err != nil {
@@ -52,7 +42,7 @@ func (a *authorization) BuildAzureParams() (*requestBody, error) {
 	bearer := qualifiedBearer[lenPrefix:]
 
 	data := &requestBody{
-		GrantType: authTypeToGrantType[FederatedAzure],
+		GrantType: "azure",
 		Jwt:       bearer,
 	}
 

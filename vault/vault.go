@@ -19,6 +19,7 @@ import (
 const (
 	defaultTLD         string = "com"
 	defaultURLTemplate string = "https://%s.secretsvaultcloud.%s/v1/%s%s"
+	dsvEnvVar          string = "DSV_AT"
 )
 
 var (
@@ -96,7 +97,7 @@ func (v Vault) accessResource(method, resource, path string, input interface{}) 
 	switch resource {
 	case clientsResource, rolesResource, secretsResource:
 	default:
-		return nil, errors.New(fmt.Sprintf("unrecognized resource: %s", resource))
+		return nil, fmt.Errorf("unrecognized resource: %s", resource)
 	}
 
 	accessToken, err := v.getAccessToken()
@@ -165,14 +166,14 @@ func (v Vault) setCacheAccessToken(value string, expiresIn int) bool {
 	if err != nil {
 		return false
 	}
-	os.Setenv("DSV_AT", string(data))
+	_ = os.Setenv(dsvEnvVar, string(data))
 	return true
 }
 
 func (v Vault) getCacheAccessToken() (string, bool) {
-	data, ok := os.LookupEnv("DSV_AT")
+	data, ok := os.LookupEnv(dsvEnvVar)
 	if !ok {
-		os.Setenv("DSV_AT", "")
+		_ = os.Setenv(dsvEnvVar, "")
 		return "", ok
 	}
 	cache := TokenCache{}
@@ -187,14 +188,14 @@ func (v Vault) getCacheAccessToken() (string, bool) {
 
 // getAccessToken returns access token fetched from DSV.
 //
-//nolint:cyclop
+//nolint:cyclop //function is not overly complex :)
 func (v Vault) getAccessToken() (string, error) {
 	accessToken, found := v.getCacheAccessToken()
 	if found {
 		return accessToken, nil
 	}
 	var rBody accessTokenRequest
-	//nolint:exhaustive
+	//nolint:exhaustive //not necessary
 	switch v.Provider {
 	case auth.AWS:
 		auth, err := auth.New(auth.Config{Provider: auth.AWS})
@@ -210,8 +211,8 @@ func (v Vault) getAccessToken() (string, error) {
 		rBody.AwsHeaders = header
 		rBody.AwsBody = body
 	case auth.AZURE:
-		auth, _ := auth.New(auth.Config{Provider: auth.AZURE})
-		data, err := auth.BuildAzureParams()
+		ath, _ := auth.New(auth.Config{Provider: auth.AZURE})
+		data, err := ath.BuildAzureParams()
 		if err != nil {
 			return "", err
 		}
@@ -227,7 +228,7 @@ func (v Vault) getAccessToken() (string, error) {
 	}
 
 	url := v.urlFor("token", "")
-	response, err := handleResponse(http.Post(url, "application/json", bytes.NewReader(request))) //nolint
+	response, err := handleResponse(http.Post(url, "application/json", bytes.NewReader(request)))
 	if err != nil {
 		return "", fmt.Errorf("fetching token: %w", err)
 	}
@@ -238,8 +239,8 @@ func (v Vault) getAccessToken() (string, error) {
 	}
 	ok := v.setCacheAccessToken(resp.AccessToken, resp.ExpiresIn)
 	if !ok {
-		var errCache = errors.New("unable to cache access token")
-		return "", errCache
+		/*		var errCache = errors.New("unable to cache access token")*/
+		return "", fmt.Errorf("unable to cache access token")
 	}
 	return resp.AccessToken, nil
 }
