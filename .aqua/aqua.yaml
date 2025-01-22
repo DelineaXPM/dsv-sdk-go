@@ -4,14 +4,18 @@
 registries:
   - type: standard
     ref: v4.299.0 # renovate: depName=aquaproj/aqua-registry
+  - name: local
+    type: local
+    path: registry.yaml
 packages:
   - name: miniscruff/changie@v1.21.0
     tags: ['release']
   - name: golang/go@go1.23.5
     tags: ['first']
   - name: direnv/direnv@v2.35.0
-  - name: magefile/mage@v1.15.0
-    tags: ['release', 'test']
+  - name: mage@v1.15.0 # now uses local go build do to upstream issues with releases
+    registry: local
+    tags: ['release', 'test', 'goinstall', 'gobuild']
   - name: charmbracelet/glow@v2.0.0
   - name: mvdan/gofumpt@v0.7.0
   - name: anchore/syft@v1.19.0
@@ -25,3 +29,5 @@ packages:
   - name: mikefarah/yq@v4.45.1
     tags:
       - release
+  - name: goreleaser/goreleaser@v2.6.1
+    tags: ['release']

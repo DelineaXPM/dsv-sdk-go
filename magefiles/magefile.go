@@ -4,7 +4,7 @@ package main
 import (
 	"os"
 
-	"github.com/DelineaXPM/dsv-sdk-go/v2/magefiles/constants"
+	"mage.local/constants"
 
 	"github.com/magefile/mage/mg"
 	"github.com/pterm/pterm"

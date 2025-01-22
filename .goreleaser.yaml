@@ -1,0 +1,55 @@
+---
+version: 2
+dist: .artifacts/goreleaser
+project_name: dsv-sdk-go
+env:
+  - CGO_ENABLED=0
+  - BUILD_NAME='{{ if index .Env "BUILD_NAME" }}{{ .Env.BUILD_NAME }}{{else}}""{{end}}'
+  - GITHUB_TOKEN=''
+  - GITLAB_TOKEN=''
+  - GITEA_TOKEN=''
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+builds:
+  - id: library
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    skip: true # this is a library, no need to product artifacts
+    # no_main_check: true
+    # command: test
+
+snapshot:
+  version_template: '{{ incpatch .Version }}-next'
+source:
+  enabled: true
+# archives:
+#   - id: archive
+#   - formats: ['tar.gz']
+#     builds:
+#       - library
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+  disable: false
+sboms:
+  - artifacts: source
+    documents:
+      - '${artifact}.spdx.sbom'
+release:
+  footer: >-
+
+    ---
+
+    Released by [GoReleaser](https://github.com/goreleaser/goreleaser).
