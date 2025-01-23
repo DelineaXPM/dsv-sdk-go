@@ -1,5 +1,0 @@
-kind: ci-and-build
-body: |-
-  Add goreleaser config for releasing library, eliminating the need to chain multiple commands together.
-  Now, push an updated changelog file by using the changie-trigger-release, merge that PR, and and the release workflow will release and tag.
-time: 2025-01-22T15:58:51.574692-06:00

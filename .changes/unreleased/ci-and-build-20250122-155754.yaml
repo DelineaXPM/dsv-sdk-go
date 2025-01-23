@@ -1,6 +1,0 @@
-kind: ci-and-build
-body: |-
-  Migrate to latest changie config, which should eliminate problems with go mod.
-  Go modules seem to have issue in vendored supporting files having emoji in the file name.
-  This will no longer occur with latest config.
-time: 2025-01-22T15:57:54.822908-06:00
