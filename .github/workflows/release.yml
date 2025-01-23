@@ -1,0 +1,14 @@
+---
+name: release
+on:
+  # push:
+  #   tags:
+  #     - 'v*'
+  workflow_dispatch:
+  workflow_call:
+permissions:
+  contents: write
+jobs:
+  release:
+    uses: delineaxpm/github-workflows/.github/workflows/release.yml@main
+    secrets: inherit

@@ -37,7 +37,7 @@ lint:
         - .changes/unreleased/*.yaml
 runtimes:
   enabled:
-    - go@1.21.6
+    - go@1.23.5
     - node@18.20.5
     - python@3.10.8
 actions:
