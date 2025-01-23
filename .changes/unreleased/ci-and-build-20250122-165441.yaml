@@ -1,3 +1,0 @@
-kind: ci-and-build
-body: Remove vendor directory to support go work usage, which isolates the mage/build automation from the SBOM generation for the library.
-time: 2025-01-22T16:54:41.079409-06:00
