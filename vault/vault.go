@@ -194,6 +194,7 @@ func (v Vault) getAccessToken() (string, error) {
 	if found {
 		return accessToken, nil
 	}
+	fmt.Printf("VAULT PROVIDER FROM VAULT.GO %+v", v.Provider)
 	var rBody accessTokenRequest
 	//nolint:exhaustive //not necessary
 	switch v.Provider {
