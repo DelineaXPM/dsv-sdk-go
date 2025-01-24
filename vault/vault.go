@@ -212,7 +212,7 @@ func (v Vault) getAccessToken() (string, error) {
 		rBody.AwsHeaders = header
 		rBody.AwsBody = body
 	case auth.AZURE:
-		fmt.Println("AZURE AUTHENTICATION IN EFFECT!!!")
+		log.Print("[DEBUG] AZURE AUTHENTICATION IN EFFECT: ")
 		ath, _ := auth.New(auth.Config{Provider: auth.AZURE})
 		data, err := ath.BuildAzureParams()
 		if err != nil {
