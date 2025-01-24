@@ -225,6 +225,7 @@ func (v Vault) getAccessToken() (string, error) {
 		rBody.ClientID = v.Credentials.ClientID
 		rBody.ClientSecret = v.Credentials.ClientSecret
 	}
+	log.Printf("[DEBUG] REQUEST = %+v:", rBody)
 	request, err := json.Marshal(&rBody)
 	if err != nil {
 	}
