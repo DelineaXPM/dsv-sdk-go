@@ -190,7 +190,7 @@ func (v Vault) getCacheAccessToken() (string, bool) {
 //
 //nolint:cyclop //function is not overly complex :)
 func (v Vault) getAccessToken() (string, error) {
-	log.Print("[DEBUG] VAULT PROVIDER FROM VAULT.GO HELLO:", v.Provider)
+	log.Debug().Str("provider", v.Provider).Msg("[DEBUG] VAULT PROVIDER FROM VAULT.GO HELLO")
 	accessToken, found := v.getCacheAccessToken()
 	if found {
 		return accessToken, nil
@@ -212,7 +212,7 @@ func (v Vault) getAccessToken() (string, error) {
 		rBody.AwsHeaders = header
 		rBody.AwsBody = body
 	case auth.AZURE:
-		log.Print("[DEBUG] AZURE AUTHENTICATION IN EFFECT: ")
+		log.Debug().Str("provider", v.Provider).Msg("[DEBUG] AZURE AUTHENTICATION IN EFFECT:")
 		ath, _ := auth.New(auth.Config{Provider: auth.AZURE})
 		data, err := ath.BuildAzureParams()
 		if err != nil {
