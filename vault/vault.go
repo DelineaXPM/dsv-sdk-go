@@ -102,7 +102,7 @@ func (v Vault) accessResource(method, resource, path string, input interface{}) 
 
 	accessToken, err := v.getAccessToken()
 	if err != nil {
-		log.Print("[DEBUG] error getting accessToken: ", err)
+		log.Print("[DEBUG] error getting accessToken SILLY: ", err)
 		return nil, err
 	}
 
@@ -214,7 +214,7 @@ func (v Vault) getAccessToken() (string, error) {
 		ath, _ := auth.New(auth.Config{Provider: auth.AZURE})
 		data, err := ath.BuildAzureParams()
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("AZURE ERROR: %w", err)
 		}
 		rBody.GrantType = data.GrantType
 		rBody.Jwt = data.Jwt
