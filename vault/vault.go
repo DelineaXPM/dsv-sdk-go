@@ -190,11 +190,11 @@ func (v Vault) getCacheAccessToken() (string, bool) {
 //
 //nolint:cyclop //function is not overly complex :)
 func (v Vault) getAccessToken() (string, error) {
+	fmt.Printf("VAULT PROVIDER FROM VAULT.GO %+v", v.Provider)
 	accessToken, found := v.getCacheAccessToken()
 	if found {
 		return accessToken, nil
 	}
-	fmt.Printf("VAULT PROVIDER FROM VAULT.GO %+v", v.Provider)
 	var rBody accessTokenRequest
 	//nolint:exhaustive //not necessary
 	switch v.Provider {
