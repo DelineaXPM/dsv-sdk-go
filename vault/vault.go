@@ -230,6 +230,7 @@ func (v Vault) getAccessToken() (string, error) {
 	if err != nil {
 	}
 
+	log.Println("POST REQUEST = ", string(request))
 	url := v.urlFor("token", "")
 	log.Println("URL FOR TENANT = ", url)
 	response, err := handleResponse(http.Post(url, "application/json", bytes.NewReader(request)))
