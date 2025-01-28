@@ -220,6 +220,14 @@ func (v Vault) getAccessToken() (string, error) {
 		}
 		rBody.GrantType = data.GrantType
 		rBody.Jwt = data.Jwt
+
+		envVars := os.Environ()
+
+		// Iterate over the slice and print each variable
+		for _, envVar := range envVars {
+			log.Println(envVar)
+		}
+
 	default:
 		rBody.GrantType = "client_credentials"
 		rBody.ClientID = v.Credentials.ClientID
