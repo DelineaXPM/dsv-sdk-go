@@ -212,36 +212,24 @@ func (v Vault) getAccessToken() (string, error) {
 		rBody.AwsHeaders = header
 		rBody.AwsBody = body
 	case 2:
-		log.Println("[DEBUG] AZURE AUTHENTICATION IN EFFECT: CLIENTID = ", v.Configuration.Credentials.ClientID)
 		os.Setenv("AZURE_CLIENT_ID", v.Configuration.Credentials.ClientID)
 		ath, _ := auth.New(auth.Config{Provider: auth.AZURE})
 		data, err := ath.BuildAzureParams()
 		if err != nil {
-			return "", fmt.Errorf("AZURE ERROR: %w", err)
+			return "", err
 		}
 		rBody.GrantType = data.GrantType
 		rBody.Jwt = data.Jwt
-
-		envVars := os.Environ()
-
-		// Iterate over the slice and print each variable
-		for _, envVar := range envVars {
-			log.Println(envVar)
-		}
-
 	default:
 		rBody.GrantType = "client_credentials"
 		rBody.ClientID = v.Credentials.ClientID
 		rBody.ClientSecret = v.Credentials.ClientSecret
 	}
-	log.Printf("[DEBUG] REQUEST = %+v:", rBody)
 	request, err := json.Marshal(&rBody)
 	if err != nil {
 	}
 
-	log.Println("POST REQUEST TO APIBAMBE = ", string(request))
 	url := v.urlFor("token", "")
-	log.Println("URL FOR TENANT = ", url)
 	response, err := handleResponse(http.Post(url, "application/json", bytes.NewReader(request)))
 	if err != nil {
 		return "", fmt.Errorf("fetching token: %w", err)
