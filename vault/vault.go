@@ -190,7 +190,6 @@ func (v Vault) getCacheAccessToken() (string, bool) {
 //
 //nolint:cyclop //function is not overly complex :)
 func (v Vault) getAccessToken() (string, error) {
-	log.Print("[DEBUG] VAULT PROVIDER FROM VAULT.GO PROVIDER = 2:", v.Provider)
 	accessToken, found := v.getCacheAccessToken()
 	if found {
 		return accessToken, nil
