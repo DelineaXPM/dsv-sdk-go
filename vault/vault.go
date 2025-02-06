@@ -52,7 +52,7 @@ type ClientCredential struct {
 // Configuration used to request an accessToken for the API
 type Configuration struct {
 	Credentials              ClientCredential
-	Tenant, TLD, URLTemplate string
+	Tenant, TenantID, TLD, URLTemplate string
 	Provider                 auth.Provider
 }
 
@@ -212,11 +212,14 @@ func (v Vault) getAccessToken() (string, error) {
 		rBody.AwsBody = body
 	case 2:
 		os.Setenv("AZURE_CLIENT_ID", v.Configuration.Credentials.ClientID)
+		os.Setenv("AZURE_CLIENT_SECRET", v.Configuration.Credentials.ClientSecret)
+		os.Setenv("AZURE_TENANT_ID", v.Configuration.TenantID)
 		ath, _ := auth.New(auth.Config{Provider: auth.AZURE})
 		data, err := ath.BuildAzureParams()
 		if err != nil {
 			return "", err
 		}
+		fmt.Printf("%+v", data)
 		rBody.GrantType = data.GrantType
 		rBody.Jwt = data.Jwt
 	default:
