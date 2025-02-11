@@ -51,9 +51,9 @@ type ClientCredential struct {
 
 // Configuration used to request an accessToken for the API
 type Configuration struct {
-	Credentials              ClientCredential
+	Credentials                        ClientCredential
 	Tenant, TenantID, TLD, URLTemplate string
-	Provider                 auth.Provider
+	Provider                           auth.Provider
 }
 
 // Vault provides access to secrets stored in Delinea DSV
@@ -219,7 +219,6 @@ func (v Vault) getAccessToken() (string, error) {
 		if err != nil {
 			return "", err
 		}
-		fmt.Printf("%+v", data)
 		rBody.GrantType = data.GrantType
 		rBody.Jwt = data.Jwt
 	default:
