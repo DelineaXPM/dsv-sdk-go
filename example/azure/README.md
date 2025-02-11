@@ -5,6 +5,7 @@
 - [Azure MSI Example](#Azure-User-Assigned-MSI-Example)
 - [Azure MSI Code](#DSV-Azure-msi-code-example)
 - [Azure Entra App Example](#Azure-Microsoft-Entra-App-example)
+- [Azure Entra Code Example](#Azure-Microsoft-Entra-Code-Example)
 
 ## DSV Overview
 
