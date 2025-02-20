@@ -1,11 +1,11 @@
 # DSV Azure Authentication
 
 - [DSV Overview](#dsv-overview)
-- [DSV Authentication Provider](#Azure-Authentication-Provider)
-- [Azure MSI Example](#Azure-User-Assigned-MSI-Example)
-- [Azure MSI Code](#DSV-Azure-msi-code-example)
-- [Azure Entra App Example](#Azure-Microsoft-Entra-App-example)
-- [Azure Entra Code Example](#Azure-Microsoft-Entra-Code-Example)
+- [DSV Authentication Provider](#azure-authentication-provider)
+- [Azure MSI Example](#azure-user-assigned-msi-example)
+- [Azure MSI Code](#dsv-azure-msi-code-example)
+- [Azure Entra App Example](#azure-microsoft-entra-app-example)
+- [Azure Entra Code Example](#azure-microsoft-entra-code-example)
 
 ## DSV Overview
 
@@ -109,12 +109,12 @@ func main() {
 }
 ```
 
-## Azure Microsoft Entra App example:
+## Azure Microsoft Entra App example
 
 When using Azure authentication from an Non Azure resouce i.e. AWS, GCP or local development.\
 
 First you will need to configure the User that corresponds to an [Azure Service Principal App](https://learn.microsoft.com/en-us/azure/developer/go/sdk/authentication/authentication-on-premises-apps?tabs=azure-cli%2Cbash).
-After you have created and configured you service principal save the credentials (you will need them for configuration). You will also need to retrieve the "Object ID" for the service principle you just created
+After you have created and configured you service principal save the credentials (you will need them for configuration). You will also need to retrieve the "Object ID" for the service principle you just created.
 
 The username is a friendly name within DSV. It does not have to match the MSI username, but the provider must match the resource id of the MSI in Azure.\
 `dsv user create --username test-api --provider azure-prod --external-id xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`\
@@ -123,41 +123,41 @@ Where:
 
 When you have successfully created a DSV user with an Azure authentication provider you can use the dsv-sdk-go as in the following example code.
 
-## Azure Microsoft Entra Code Example:
+## Azure Microsoft Entra Code Example
 
 ```golang
 package main
 
 import (
-	"fmt"
-	"log"
+    "fmt"
+    "log"
 
-	"github.com/DelineaXPM/dsv-sdk-go/v2/vault"
+    "github.com/DelineaXPM/dsv-sdk-go/v2/vault"
 )
 
 func main() {
-	// Azure authentication
-	dsv, err := vault.New(vault.Configuration{
-		Credentials: vault.ClientCredential{
-			ClientID:     "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-			ClientSecret: "zzzz~zzzzzz.zzzzzzzzzzzzzzzzzzzzzzzz",
-		},
-		Tenant:      "<yourTenantName>",
-		TenantID:    "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-		TLD:         "com", // replace with au, eu as necessary
-		Provider:    2,
-	})
+    // Azure authentication
+    dsv, err := vault.New(vault.Configuration{
+        Credentials: vault.ClientCredential{
+            ClientID:     "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+            ClientSecret: "zzzz~zzzzzz.zzzzzzzzzzzzzzzzzzzzzzzz",
+        },
+        Tenant:      "<yourTenantName>",
+        TenantID:    "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        TLD:         "com", // replace with au, eu as necessary
+        Provider:    2,
+    })
 
-	if err != nil {
-		log.Fatalf("failed to configure vault: %v", err)
-	}
+    if err != nil {
+        log.Fatalf("failed to configure vault: %v", err)
+    }
 
-	secret, err := dsv.Secret("<secretPathORIdentifierHere")
+    secret, err := dsv.Secret("<secretPathORIdentifierHere")
 
-	if err != nil {
-		log.Fatalf("failed to fetch secret: %v", err)
-	}
+    if err != nil {
+        log.Fatalf("failed to fetch secret: %v", err)
+    }
 
-	fmt.Printf("\nsecret data: %v\n\n", secret.Data)
+    fmt.Printf("\nsecret data: %v\n\n", secret.Data)
 }
 ```
