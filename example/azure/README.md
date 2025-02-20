@@ -11,11 +11,11 @@
 
 You can use the DSV web UI or the DSV cli to configure authentication using Azure.
 For this document we will use the DSV cli.
-To begin using Azure authentication you need to configure a DSV authentication provider.\
+To begin using Azure authentication you need to configure a DSV authentication provider.
 
 To see all of your current authentication providers.
-Run\
-`dsv config auth-provider search -e yaml`\
+Run
+`dsv config auth-provider search -e yaml`
 
 Initially, the only authentication provider is Thycotic One, similar to this:
 
@@ -69,7 +69,7 @@ version: "0"
 When using dsv-sdk-go from an Azure resouce i.e. Azure VM or Kubernetes service (AKS).\
 First you will need to configure the User that corresponds to an [Azure User Assigned MSI](https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview).
 The username is a friendly name within DSV. It does not have to match the MSI username, but the provider must match the resource id of the MSI in Azure.\
-`dsv user create --username test-api --provider azure-prod --external-id /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourcegroups/build/providers/Microsoft.ManagedIdentity/userAssignedIdentities/test-api`\
+`dsv user create --username test-api --provider azure-prod --external-id /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourcegroups/build/providers/Microsoft.ManagedIdentity/userAssignedIdentities/test-api`
 
 When you have successfully created a DSV user with an Azure authentication provider you can use the dsv-sdk-go as in the following example code.
 
@@ -111,7 +111,7 @@ func main() {
 
 ## Azure Microsoft Entra App example
 
-When using Azure authentication from an Non Azure resouce i.e. AWS, GCP or local development.\
+When using Azure authentication from an Non Azure resouce i.e. AWS, GCP or local development.
 
 First you will need to configure the User that corresponds to an [Azure Service Principal App](https://learn.microsoft.com/en-us/azure/developer/go/sdk/authentication/authentication-on-premises-apps?tabs=azure-cli%2Cbash).
 After you have created and configured you service principal save the credentials (you will need them for configuration). You will also need to retrieve the "Object ID" for the service principle you just created.
