@@ -211,9 +211,9 @@ func (v Vault) getAccessToken() (string, error) {
 		rBody.AwsHeaders = header
 		rBody.AwsBody = body
 	case 2:
-		_ := os.Setenv("AZURE_CLIENT_ID", v.Configuration.Credentials.ClientID)
-		_ := os.Setenv("AZURE_CLIENT_SECRET", v.Configuration.Credentials.ClientSecret)
-		_ := os.Setenv("AZURE_TENANT_ID", v.Configuration.TenantID)
+		_ = os.Setenv("AZURE_CLIENT_ID", v.Configuration.Credentials.ClientID)
+		_ = os.Setenv("AZURE_CLIENT_SECRET", v.Configuration.Credentials.ClientSecret)
+		_ = os.Setenv("AZURE_TENANT_ID", v.Configuration.TenantID)
 		ath, _ := auth.New(auth.Config{Provider: auth.AZURE})
 		data, err := ath.BuildAzureParams()
 		if err != nil {
