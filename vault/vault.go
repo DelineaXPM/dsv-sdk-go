@@ -210,7 +210,7 @@ func (v Vault) getAccessToken() (string, error) {
 		rBody.GrantType = "aws_iam"
 		rBody.AwsHeaders = header
 		rBody.AwsBody = body
-	case 2:
+	case auth.AZURE:
 		_ = os.Setenv("AZURE_CLIENT_ID", v.Configuration.Credentials.ClientID)
 		_ = os.Setenv("AZURE_CLIENT_SECRET", v.Configuration.Credentials.ClientSecret)
 		_ = os.Setenv("AZURE_TENANT_ID", v.Configuration.TenantID)

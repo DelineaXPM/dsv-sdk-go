@@ -145,7 +145,7 @@ func main() {
         Tenant:      "<yourTenantName>",
         TenantID:    "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         TLD:         "com", // replace with au, eu as necessary
-        Provider:    2,
+        Provider:    3,
     })
 
     if err != nil {
