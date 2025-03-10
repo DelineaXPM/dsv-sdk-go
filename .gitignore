@@ -38,7 +38,7 @@ _artifacts
 mage_output_file.go
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
-
+.DS_Store
 ./artifacts
 **/*/*.exe
 **/*/bin
@@ -51,3 +51,4 @@ _artifacts
 mage_output_file.go
 dist/
 /test_config.json
+auth_azure.go
