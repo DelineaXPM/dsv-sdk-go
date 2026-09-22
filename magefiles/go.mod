@@ -1,6 +1,9 @@
 module mage.local
 
 go 1.23
+
+toolchain go1.26.8
+
 require (
 	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/magefile/mage v1.15.0
