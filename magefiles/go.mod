@@ -1,6 +1,6 @@
 module mage.local
 
-go 1.23
+go 1.25.0
 
 toolchain go1.26.8
 
@@ -32,9 +32,9 @@ require (
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/ztrue/tracerr v0.4.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
-	golang.org/x/mod v0.17.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/mod v0.40.0 // indirect
+	golang.org/x/sys v0.44.0 // indirect
 	golang.org/x/term v0.26.0 // indirect
-	golang.org/x/text v0.20.0 // indirect
+	golang.org/x/text v0.39.0 // indirect
 	mvdan.cc/sh/v3 v3.7.0 // indirect
 )
