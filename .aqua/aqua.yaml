@@ -10,7 +10,7 @@ registries:
 packages:
   - name: miniscruff/changie@v1.21.0
     tags: ['release']
-  - name: golang/go@go1.23.5
+  - name: golang/go@go1.26.8
     tags: ['first']
   - name: direnv/direnv@v2.35.0
   - name: mage@v1.15.0 # now uses local go build do to upstream issues with releases
